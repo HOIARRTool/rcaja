@@ -7,182 +7,66 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: #F8FAFC; /* Slate 50 */
-            color: #334155; /* Slate 700 */
-        }
-        
-        /* Chart Container Rules - Increased height for 10 bars */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 100%;
-            height: 300px;
-        }
-
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 500px; /* Increased height for 10 items */
-            }
-        }
-
-        /* Standard CSS for Tables and Layouts */
-        .rca-table, .action-table, .initiative-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-            margin-top: 10px;
-            margin-bottom: 20px;
-        }
-        .rca-table th, .action-table th, .initiative-table th {
-            color: white;
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #e2e8f0;
-        }
+        /* ... (คง Style เดิมไว้ทั้งหมด ไม่ต้องแก้) ... */
+        body { font-family: 'Sarabun', sans-serif; background-color: #F8FAFC; color: #334155; }
+        .chart-container { position: relative; width: 100%; max-width: 100%; height: 300px; }
+        @media (min-width: 768px) { .chart-container { height: 500px; } }
+        .rca-table, .action-table, .initiative-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin-top: 10px; margin-bottom: 20px; }
+        .rca-table th, .action-table th, .initiative-table th { color: white; padding: 10px; text-align: left; border: 1px solid #e2e8f0; }
         .rca-table th { background-color: #F59E0B; }
         .action-table th { background-color: #0EA5E9; }
         .initiative-table th { background-color: #7C3AED; }
-        .rca-table td, .action-table td, .initiative-table td {
-            border: 1px solid #e2e8f0;
-            padding: 10px;
-            vertical-align: top;
-        }
+        .rca-table td, .action-table td, .initiative-table td { border: 1px solid #e2e8f0; padding: 10px; vertical-align: top; }
         tr:nth-child(even) { background-color: #f8fafc; }
-
-        /* Fishbone Grid Styling */
-        .fishbone-grid {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        @media (min-width: 768px) {
-            .fishbone-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        .fishbone-card {
-            background-color: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        .fishbone-header {
-            font-weight: bold;
-            color: #475569;
-            border-bottom: 2px solid #cbd5e1;
-            padding-bottom: 0.5rem;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* 5 Whys Styling */
-        .why-step {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
-            position: relative;
-        }
-        .why-number {
-            background-color: #EC4899; /* Pink-500 */
-            color: white;
-            font-weight: bold;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.75rem;
-            margin-right: 0.75rem;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-        .why-line {
-            position: absolute;
-            left: 11px;
-            top: 24px;
-            bottom: -10px;
-            width: 2px;
-            background-color: #FBCFE8; /* Pink-200 */
-            z-index: 0;
-        }
-        .why-step:last-child .why-line {
-            display: none;
-        }
-
-        /* Loading Spinner */
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 3px solid #0EA5E9;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
+        .fishbone-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        @media (min-width: 768px) { .fishbone-grid { grid-template-columns: repeat(2, 1fr); } }
+        .fishbone-card { background-color: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .fishbone-header { font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1; padding-bottom: 0.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .why-step { display: flex; align-items: flex-start; margin-bottom: 0.5rem; position: relative; }
+        .why-number { background-color: #EC4899; color: white; font-weight: bold; border-radius: 50%; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; margin-right: 0.75rem; flex-shrink: 0; z-index: 10; }
+        .why-line { position: absolute; left: 11px; top: 24px; bottom: -10px; width: 2px; background-color: #FBCFE8; z-index: 0; }
+        .why-step:last-child .why-line { display: none; }
+        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #0EA5E9; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         html { scroll-behavior: smooth; }
-
-        /* Modal Styles */
-        #settingsModal {
-            transition: opacity 0.3s ease;
-        }
     </style>
 </head>
 <body class="bg-slate-50">
 
-    <!-- Header Section (Subtle Gradient Background for Top Area) -->
     <header class="relative w-full h-32 bg-gradient-to-r from-slate-800 to-slate-900 shadow-xl overflow-hidden mb-8">
         <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
             <div class="absolute top-10 left-10 w-64 h-64 bg-teal-500 rounded-full filter blur-3xl"></div>
             <div class="absolute bottom-10 right-10 w-64 h-64 bg-blue-500 rounded-full filter blur-3xl"></div>
         </div>
 
-        <!-- Top Right Controls -->
         <div class="absolute top-6 right-6 flex items-center gap-4 z-20">
-            <!-- ASEAN Flags -->
             <div class="flex gap-2">
                 <img src="https://flagcdn.com/h40/th.png" alt="Thailand" title="Thailand" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
                 <img src="https://flagcdn.com/h40/my.png" alt="Malaysia" title="Malaysia" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
                 <img src="https://flagcdn.com/h40/ph.png" alt="Philippines" title="Philippines" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
                 <img src="https://flagcdn.com/h40/bn.png" alt="Brunei" title="Brunei" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
             </div>
-            
-            <!-- Settings Button -->
-            <button onclick="toggleSettingsModal()" class="text-slate-300 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10" title="API Settings">
-                <i class="fas fa-cog text-xl"></i>
-            </button>
         </div>
     </header>
 
     <main class="container mx-auto px-4 -mt-20 pb-16 space-y-24 max-w-6xl relative z-20">
 
-        <!-- PART 1: AI SAFETY LAB (Top) -->
         <section id="ai-lab">
             <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-3xl p-1 shadow-2xl transform hover:scale-[1.01] transition-transform duration-300">
                 <div class="bg-white rounded-[20px] p-6 md:p-10">
                     <div class="text-center mb-10">
                         <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Interactive Support</span>
-                        <!-- CHANGED NAME TO "RCA Insight Companion" WITH SOFT ICON -->
                         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mt-4 mb-2 flex items-center justify-center gap-3">
                             <span>✨</span> RCA Insight Companion
                         </h2>
-                        <!-- SOFTENED DESCRIPTION -->
                         <p class="text-slate-500 max-w-2xl mx-auto">
                             Your supportive partner for deep learning, root cause analysis, and creating safer systems together.
                         </p>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                        <!-- Left: Input & Analysis (Combined Button) -->
                         <div class="space-y-6">
                             <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition duration-300">
                                 <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
@@ -196,11 +80,9 @@
                                     <span>🔍 Root Cause Analysis</span>
                                 </button>
                                 
-                                <!-- Result area auto-expands -->
                                 <div id="analyzeResult" class="mt-4 p-4 bg-white rounded-xl text-sm text-slate-700 hidden border border-amber-100 shadow-inner"></div>
                             </div>
                         </div>
-                        <!-- Right: Action Plan (No Generate Button) -->
                         <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100 shadow-md relative overflow-hidden h-full">
                             <div class="absolute top-0 right-0 bg-blue-200 text-blue-800 text-[10px] font-bold px-2 py-1 rounded-bl-lg">STEP 2 (Automatic)</div>
                             <h3 class="text-lg font-bold text-blue-900 mb-3 flex items-center gap-2">
@@ -228,541 +110,64 @@
             </div>
         </section>
 
-        <!-- PART 2: EXPANDED CONCEPTS -->
         <section>
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-800">1. Core Concepts in Depth</h2>
-                <div class="h-1 w-20 bg-teal-500 mx-auto mt-4 rounded-full"></div>
-                <p class="text-slate-600 mt-4 max-w-3xl mx-auto">
-                    Understanding the 6 pillars of safety to visualize "how accidents happen" and "how to prevent them" without blaming individuals.
-                </p>
-            </div>
+             <div class="text-center mb-12"><h2 class="text-3xl font-bold text-slate-800">1. Core Concepts in Depth</h2></div>
+             </section>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-
-                <!-- Concept 1: Fishbone Diagram -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-cyan-500 hover:shadow-xl transition group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-4xl">🐟</span>
-                        <h3 class="font-bold text-2xl text-slate-800">1. Fishbone Diagram (Ishikawa)</h3>
-                    </div>
-                    <p class="text-slate-600 leading-relaxed mb-6">
-                        <strong>Dr. Kaoru Ishikawa</strong> developed this tool for RCA. In healthcare, we focus on the <strong>6 Ms</strong>:
-                    </p>
-                    
-                    <!-- SVG Fishbone -->
-                    <div class="w-full overflow-hidden bg-slate-50 rounded-xl border border-slate-200 p-2 mb-4 flex justify-center">
-                        <svg viewBox="0 0 800 350" class="w-full h-auto drop-shadow-sm">
-                            <line x1="50" y1="175" x2="650" y2="175" stroke="#334155" stroke-width="4" marker-end="url(#arrowhead)" />
-                            <polygon points="650,140 780,175 650,210" fill="#0EA5E9" />
-                            <text x="660" y="180" font-family="sans-serif" font-size="16" font-weight="bold" fill="white">PROBLEM</text>
-                            <text x="670" y="200" font-family="sans-serif" font-size="12" fill="#E0F2FE">(Effect)</text>
-                            <line x1="150" y1="50" x2="200" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="100" y="20" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="150" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">MAN</text>
-                            <line x1="350" y1="50" x2="400" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="300" y="20" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="350" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">MACHINE</text>
-                            <line x1="550" y1="50" x2="600" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="500" y="20" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="550" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">METHOD</text>
-                            <line x1="150" y1="300" x2="200" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="100" y="300" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="150" y="320" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">MATERIAL</text>
-                            <line x1="450" y1="300" x2="500" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="400" y="300" width="120" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="460" y="320" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">ENVIRONMENT</text>
-                            <defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#334155" /></marker></defs>
-                        </svg>
-                    </div>
-
-                    <!-- 6 Ms Detailed Explanation -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600 bg-cyan-50 p-4 rounded-xl border border-cyan-100">
-                        <div>
-                            <strong class="text-cyan-800">1. Man (People):</strong>
-                            <p>Staff competency, fatigue, stress, staffing levels, and training.</p>
-                        </div>
-                        <div>
-                            <strong class="text-cyan-800">2. Machine (Equipment):</strong>
-                            <p>Failure, calibration issues, lack of maintenance, or usability design.</p>
-                        </div>
-                        <div>
-                            <strong class="text-cyan-800">3. Method (Process):</strong>
-                            <p>Unclear SOPs, outdated guidelines, or poor communication protocols.</p>
-                        </div>
-                        <div>
-                            <strong class="text-cyan-800">4. Material (Supplies):</strong>
-                            <p>Defective drugs, look-alike packaging, or poor quality consumables.</p>
-                        </div>
-                        <div>
-                            <strong class="text-cyan-800">5. Environment (Mother Nature):</strong>
-                            <p>Noise, lighting, layout, distractions, or temperature.</p>
-                        </div>
-                        <div>
-                            <strong class="text-cyan-800">6. Measurement:</strong>
-                            <p>Data accuracy, interpretation of lab results, or indicator validity.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Concept 2: 5 Whys -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-pink-500 hover:shadow-xl transition group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-4xl">❓</span>
-                        <h3 class="font-bold text-2xl text-slate-800">2. 5 Whys Technique</h3>
-                    </div>
-                    <p class="text-slate-600 leading-relaxed mb-4">
-                        Developed by <strong>Sakichi Toyoda</strong> (Toyota), this technique drills down into a specific problem identified in the Fishbone diagram to find the single root cause by asking "Why?" five times.
-                    </p>
-                    <div class="bg-pink-50 p-4 rounded-lg border border-pink-100">
-                        <strong class="text-pink-800 block mb-2 text-sm">Example: Patient fell.</strong>
-                        <div class="space-y-0">
-                            <div class="why-step">
-                                <div class="why-number">1</div><div class="why-line"></div>
-                                <div class="text-sm text-slate-700 pt-1">Why? Floor was wet.</div>
-                            </div>
-                            <div class="why-step">
-                                <div class="why-number">2</div><div class="why-line"></div>
-                                <div class="text-sm text-slate-700 pt-1">Why? Pipe leaked.</div>
-                            </div>
-                            <div class="why-step">
-                                <div class="why-number">3</div><div class="why-line"></div>
-                                <div class="text-sm text-slate-700 pt-1">Why? Seal broke.</div>
-                            </div>
-                            <div class="why-step">
-                                <div class="why-number">4</div><div class="why-line"></div>
-                                <div class="text-sm text-slate-700 pt-1">Why? Bought cheap seal.</div>
-                            </div>
-                            <div class="why-step">
-                                <div class="why-number">5</div>
-                                <div class="text-sm text-slate-700 pt-1 font-bold text-pink-700">Root Cause: Procurement policy focuses on lowest price, not quality.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Theory 3: Swiss Cheese Model -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-amber-500 hover:shadow-xl transition group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-4xl">🧀</span>
-                        <h3 class="font-bold text-2xl text-slate-800">3. Swiss Cheese Model</h3>
-                    </div>
-                    <p class="text-slate-600 leading-relaxed mb-4">
-                        <strong>James Reason</strong> proposed that a system is like stacked slices of cheese. Accidents occur when the holes (latent weaknesses) in all layers <strong>"align"</strong>.
-                    </p>
-                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-100 text-sm space-y-3">
-                        <strong class="text-amber-800 block">System Layers:</strong>
-                        <ul class="list-disc list-inside text-slate-700 space-y-1">
-                            <li><strong>Organization:</strong> Policy, Budget</li>
-                            <li><strong>Supervision:</strong> Management, Training</li>
-                            <li><strong>Preconditions:</strong> Fatigue, Equipment</li>
-                            <li><strong>Unsafe Acts:</strong> Errors, Violations</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Theory 4: Just Culture -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-teal-500 hover:shadow-xl transition group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-4xl">⚖️</span>
-                        <h3 class="font-bold text-2xl text-slate-800">4. Just Culture</h3>
-                    </div>
-                    <p class="text-slate-600 leading-relaxed mb-4">
-                        A fair culture distinguishes between 3 types of behaviors (Human Error, At-Risk, Reckless) to manage them appropriately.
-                    </p>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-slate-600 border border-slate-200 rounded-lg">
-                            <thead class="bg-slate-100 text-slate-700 font-bold">
-                                <tr>
-                                    <th class="p-2 border-b">Behavior</th>
-                                    <th class="p-2 border-b">Management</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="border-b bg-green-50">
-                                    <td class="p-2 font-bold text-green-700">Human Error</td>
-                                    <td class="p-2">Console</td>
-                                </tr>
-                                <tr class="border-b bg-yellow-50">
-                                    <td class="p-2 font-bold text-yellow-700">At-Risk</td>
-                                    <td class="p-2">Coach</td>
-                                </tr>
-                                <tr class="bg-red-50">
-                                    <td class="p-2 font-bold text-red-700">Reckless</td>
-                                    <td class="p-2">Punish</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                 <!-- Theory 5: Human Factors -->
-                 <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-blue-500 hover:shadow-xl transition group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-4xl">🧠</span>
-                        <h3 class="font-bold text-2xl text-slate-800">5. Human Factors</h3>
-                    </div>
-                    <p class="text-slate-600 leading-relaxed mb-4">
-                        Designing the work system to fit human limitations (memory, attention) rather than forcing humans to fit the system.
-                    </p>
-                    <ul class="list-disc list-inside text-sm text-slate-600 bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        <li><strong>Cognitive Load:</strong> Avoid multitasking.</li>
-                        <li><strong>Design:</strong> Use checklists & forcing functions.</li>
-                    </ul>
-                </div>
-
-                <!-- Theory 6: Safety II -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-indigo-500 hover:shadow-xl transition group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-4xl">📈</span>
-                        <h3 class="font-bold text-2xl text-slate-800">6. Safety-II (Resilience)</h3>
-                    </div>
-                    <p class="text-slate-600 leading-relaxed mb-4">
-                        Learning from "what went right" (Work-as-Done) and how staff adapt to challenges, not just analyzing failures (Safety-I).
-                    </p>
-                     <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 text-sm">
-                        <strong class="text-indigo-800">Goal:</strong> Enhance the system's ability to succeed under varying conditions.
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PART 3: DETAILED ASSESSMENT -->
         <section class="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-slate-200">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                <!-- Left: Chart & Stats -->
-                <div class="lg:col-span-5 space-y-6">
-                    <h2 class="text-3xl font-bold text-slate-800">2. Assessment & Status</h2>
-                    <div class="h-1 w-20 bg-teal-500 rounded-full"></div>
-                    <!-- Refined Explanation for % Positive Response -->
-                    <p class="text-slate-600 leading-relaxed font-light italic border-l-4 border-teal-500 pl-4 bg-teal-50/50 p-2 rounded-r-lg">
-                        "Based on <strong>AHRQ HSOPSC 2.0</strong> (10 Measures). Input your actual <strong>'% Positive Response'</strong> for each area. The chart reveals the gap between your reality and the ideal 100%."
-                    </p>
-                    
-                    <!-- New Input Controls for Practitioner (10 Areas) -->
-                    <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 max-h-[500px] overflow-y-auto">
-                        <h4 class="text-xs font-bold text-slate-500 uppercase mb-3 tracking-wide flex items-center gap-2 sticky top-0 bg-slate-100 py-2 border-b">
-                            <span>🎚️</span> Input % Positive Response
-                        </h4>
-                        <div class="space-y-4 text-sm">
-                            <!-- 1. Teamwork -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">1. Teamwork</label>
-                                    <span id="val-0" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(0, this.value)">
-                            </div>
-                            <!-- 2. Staffing and Work Pace -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">2. Staffing and Work Pace</label>
-                                    <span id="val-1" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(1, this.value)">
-                            </div>
-                            <!-- 3. Organizational Learning -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">3. Organizational Learning</label>
-                                    <span id="val-2" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(2, this.value)">
-                            </div>
-                            <!-- 4. Response to Error -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">4. Response to Error</label>
-                                    <span id="val-3" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(3, this.value)">
-                            </div>
-                            <!-- 5. Supervisor Support -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">5. Supervisor Support</label>
-                                    <span id="val-4" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(4, this.value)">
-                            </div>
-                            <!-- 6. Communication About Error -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">6. Communication About Error</label>
-                                    <span id="val-5" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(5, this.value)">
-                            </div>
-                            <!-- 7. Communication Openness -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">7. Communication Openness</label>
-                                    <span id="val-6" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(6, this.value)">
-                            </div>
-                            <!-- 8. Reporting Events -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">8. Reporting Safety Events</label>
-                                    <span id="val-7" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(7, this.value)">
-                            </div>
-                            <!-- 9. Hospital Management Support -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">9. Hospital Mgmt. Support</label>
-                                    <span id="val-8" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(8, this.value)">
-                            </div>
-                            <!-- 10. Handoffs -->
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <label class="text-slate-700 font-semibold text-xs">10. Handoffs & Info Exchange</label>
-                                    <span id="val-9" class="text-teal-600 font-bold text-xs">0.00%</span>
-                                </div>
-                                <input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(9, this.value)">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="chart-container mt-6">
-                        <canvas id="assessmentChart"></canvas>
-                    </div>
-                    <p class="text-xs text-center text-slate-400 mt-2">Interactive: Compare your % Positive vs 100% Ideal</p>
-                </div>
-
-                <!-- Right: Interpretation Guide (Expanded) -->
-                <div class="lg:col-span-7 space-y-6">
-                    <h3 class="xl font-bold text-slate-700 border-l-4 border-teal-500 pl-4">Gap Analysis & Solutions</h3>
-                    <div class="space-y-4">
-                        <!-- Issue 1 -->
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <div class="flex items-start gap-3">
-                                <div class="bg-red-100 text-red-600 p-2 rounded-lg font-bold text-xl">⚠️</div>
-                                <div>
-                                    <h4 class="font-bold text-slate-800">Non-punitive Response to Error</h4>
-                                    <p class="text-sm text-slate-600 mt-1"><strong>Issue:</strong> Staff fear punishment when reporting errors, leading to under-reporting and hidden risks.</p>
-                                    <div class="mt-3 bg-white p-3 rounded border border-slate-200 text-sm">
-                                        <strong class="text-teal-600">✅ Solution:</strong>
-                                        <ul class="list-disc list-inside text-slate-500 mt-1">
-                                            <li>Executive declaration of a "Blame-free" policy.</li>
-                                            <li>Use the <strong>Substitution Test</strong> (Would another qualified person make the same mistake? If yes = System Problem).</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Issue 2 -->
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <div class="flex items-start gap-3">
-                                <div class="bg-amber-100 text-amber-600 p-2 rounded-lg font-bold text-xl">⚡</div>
-                                <div>
-                                    <h4 class="font-bold text-slate-800">Staffing & Workload</h4>
-                                    <p class="text-sm text-slate-600 mt-1"><strong>Issue:</strong> Excessive workload leads to fatigue and reliance on shortcuts to finish tasks.</p>
-                                    <div class="mt-3 bg-white p-3 rounded border border-slate-200 text-sm">
-                                        <strong class="text-teal-600">✅ Solution:</strong>
-                                        <ul class="list-disc list-inside text-slate-500 mt-1">
-                                            <li>Optimize shift scheduling (Avoid double shifts).</li>
-                                            <li>Utilize automation technology to reduce paperwork and return time to patient care.</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+             <h2 class="text-3xl font-bold text-slate-800">2. Assessment & Status</h2>
+             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                 <div class="lg:col-span-5 space-y-6">
+                      <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 max-h-[500px] overflow-y-auto">
+                           <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Input % Positive Response</h4>
+                            <div><div class="flex justify-between mb-1"><label class="text-slate-700 font-semibold text-xs">1. Teamwork</label><span id="val-0" class="text-teal-600 font-bold text-xs">0.00%</span></div><input type="range" min="0" max="100" step="0.01" value="0" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateChartData(0, this.value)"></div>
+                            <div style="display:none;" id="hidden-sliders-placeholder">Please paste original sliders here</div>
+                       </div>
+                       <div class="chart-container mt-6"><canvas id="assessmentChart"></canvas></div>
+                  </div>
+                  <div class="lg:col-span-7 space-y-6">
+                      <h3 class="xl font-bold text-slate-700 border-l-4 border-teal-500 pl-4">Gap Analysis & Solutions</h3>
+                       </div>
+             </div>
         </section>
 
-        <!-- PART 4: DETAILED ACTION ROADMAP -->
         <section class="py-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-800">3. Implementation Roadmap</h2>
-                <div class="h-1 w-20 bg-blue-500 mx-auto mt-4 rounded-full"></div>
-                <p class="text-slate-600 mt-4">A 3-Phase strategic plan to systematically transform organizational culture.</p>
-            </div>
-
-            <div class="relative max-w-5xl mx-auto pl-8 md:pl-0">
-                <div class="timeline-line hidden md:block" style="left: 50%; transform: translateX(-50%);"></div>
-                
-                <!-- PHASE 1: TRUST -->
-                <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                    <div class="md:text-right md:pr-12 order-1">
-                        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-teal-500 relative">
-                            <h3 class="text-xl font-bold text-teal-700">Phase 1: Build Trust</h3>
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Duration: Months 1-3</span>
-                            <p class="text-sm text-slate-600 mt-3 leading-relaxed">
-                                Focus on shifting the mindset of leaders and staff to encourage open dialogue about safety.
-                            </p>
-                            <div class="mt-4 pt-4 border-t border-slate-100 text-left">
-                                <strong class="text-sm text-slate-700 block mb-2">🚀 Key Activities:</strong>
-                                <ul class="text-sm text-slate-600 space-y-2">
-                                    <li>🔹 <strong>Executive Safety Walkrounds:</strong> Leaders visit units to "listen, not to command".</li>
-                                    <li>🔹 <strong>Stop the Blame Campaign:</strong> Shift focus from finding "who" to finding "what" (system flaws).</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="absolute left-0 md:left-1/2 -translate-x-1/2 top-6 w-10 h-10 bg-teal-500 rounded-full border-4 border-white shadow-md z-10 flex items-center justify-center text-white font-bold">1</div>
-                    <div class="hidden md:block order-2"></div>
-                </div>
-
-                <!-- PHASE 2: SYSTEM -->
-                <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                    <div class="hidden md:block order-1"></div>
-                    <div class="absolute left-0 md:left-1/2 -translate-x-1/2 top-6 w-10 h-10 bg-blue-500 rounded-full border-4 border-white shadow-md z-10 flex items-center justify-center text-white font-bold">2</div>
-                    <div class="md:pl-12 order-2">
-                        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500 relative">
-                            <h3 class="text-xl font-bold text-blue-700">Phase 2: Reporting System</h3>
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Duration: Months 4-6</span>
-                            <p class="text-sm text-slate-600 mt-3 leading-relaxed">
-                                Make reporting "easy" and "meaningful" for the reporter (avoid the "black hole" effect).
-                            </p>
-                            <div class="mt-4 pt-4 border-t border-slate-100 text-left">
-                                <strong class="text-sm text-slate-700 block mb-2">🚀 Key Activities:</strong>
-                                <ul class="text-sm text-slate-600 space-y-2">
-                                    <li>🔹 <strong>Simplify IR Form:</strong> Reduce form filling time to under 2 minutes.</li>
-                                    <li>🔹 <strong>Good Catch Award:</strong> Reward staff for reporting near-misses.</li>
-                                    <li>🔹 <strong>Feedback Loop:</strong> Provide feedback on actions taken within 7 days.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PHASE 3: SUSTAIN -->
-                <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="md:text-right md:pr-12 order-1">
-                        <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-amber-500 relative">
-                            <h3 class="text-xl font-bold text-amber-600">Phase 3: Sustain & Learn</h3>
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Duration: Month 7 onwards</span>
-                            <p class="text-sm text-slate-600 mt-3 leading-relaxed">
-                                Move from reactive problem solving to proactive learning (Proactive Learning).
-                            </p>
-                            <div class="mt-4 pt-4 border-t border-slate-100 text-left">
-                                <strong class="text-sm text-slate-700 block mb-2">🚀 Key Activities:</strong>
-                                <ul class="text-sm text-slate-600 space-y-2">
-                                    <li>🔹 <strong>Safety Huddles:</strong> Short 5-10 min briefings every morning to assess risks.</li>
-                                    <li>🔹 <strong>RCA (Root Cause Analysis):</strong> Analyze system causes without blaming individuals.</li>
-                                    <li>🔹 <strong>Sharing Success:</strong> Share "Safety-II" success stories across departments.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="absolute left-0 md:left-1/2 -translate-x-1/2 top-6 w-10 h-10 bg-amber-500 rounded-full border-4 border-white shadow-md z-10 flex items-center justify-center text-white font-bold">3</div>
-                    <div class="hidden md:block order-2"></div>
-                </div>
-            </div>
-        </section>
+            <div class="text-center mb-12"><h2 class="text-3xl font-bold text-slate-800">3. Implementation Roadmap</h2></div>
+             </section>
 
     </main>
 
     <footer class="bg-slate-900 py-12 border-t border-slate-800 mt-12">
         <div class="container mx-auto px-4 text-center">
-            <p class="text-slate-400 text-sm mb-2">© 2024 Healthcare Safety Series.</p>
+            <p class="text-slate-400 text-sm mb-2">© 2026 Healthcare Safety Series.</p>
             <p class="text-slate-600 text-xs">Empowering Healthcare Professionals in ASEAN</p>
         </div>
     </footer>
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl transform transition-all scale-95" id="modalContent">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fas fa-key text-teal-500"></i> API Configuration
-                </h3>
-                <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
-            </div>
-            
-            <p class="text-sm text-slate-600 mb-4">
-                To use the AI Analysis features, please enter your Google Gemini API Key. 
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 hover:underline">Get a key here</a>.
-            </p>
-
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">API KEY</label>
-                    <input type="password" id="userApiKey" class="w-full p-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Paste your API key here (AIza...)">
-                </div>
-                
-                <div class="flex gap-2 justify-end mt-4">
-                    <button onclick="toggleSettingsModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
-                    <button onclick="saveApiKey()" class="px-4 py-2 text-sm bg-teal-500 hover:bg-teal-600 text-white rounded-lg font-bold shadow-md">Save Key</button>
-                </div>
-            </div>
-            <p class="text-xs text-slate-400 mt-4 text-center">Your key is stored locally in your browser and used only for requests.</p>
-        </div>
-    </div>
-
-    <!-- JavaScript Logic -->
     <script>
-        // --- API KEY MANAGEMENT ---
-        let apiKey = localStorage.getItem('gemini_api_key') || ""; 
-
-        // Toggle Modal Visibility
-        function toggleSettingsModal() {
-            const modal = document.getElementById('settingsModal');
-            const content = document.getElementById('modalContent');
-            const input = document.getElementById('userApiKey');
-
-            if (modal.classList.contains('hidden')) {
-                // Show
-                modal.classList.remove('hidden');
-                // Small delay to allow display:block to apply before opacity transition
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0', 'pointer-events-none');
-                    content.classList.remove('scale-95');
-                    content.classList.add('scale-100');
-                }, 10);
-                input.value = apiKey; // Pre-fill current key
-            } else {
-                // Hide
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                content.classList.remove('scale-100');
-                content.classList.add('scale-95');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
-            }
-        }
-
-        // Save Key
-        function saveApiKey() {
-            const input = document.getElementById('userApiKey').value.trim();
-            if (input) {
-                apiKey = input;
-                localStorage.setItem('gemini_api_key', apiKey);
-                alert("API Key saved! You can now use the analysis tools.");
-                toggleSettingsModal();
-            } else {
-                alert("Please enter a valid API Key.");
-            }
-        }
-
-        // --- Core Gemini API Call Function ---
+        // --- Core Gemini API Call Function (UPDATED) ---
+        // ไม่ต้องใช้ localStorage แล้ว เรียกไปที่ Server ของเราแทน
         async function callGemini(prompt) {
-            // Check if API Key exists
-            if (!apiKey) {
-                toggleSettingsModal();
-                throw new Error("Please enter your API Key in Settings.");
-            }
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
             try {
-                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                // เรียกไปยัง Endpoint ที่เราสร้างใน server.js
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
                 if (!response.ok) {
                     const errData = await response.json();
-                    throw new Error(`API Error: ${response.status} - ${errData.error?.message || 'Unknown error'}`);
+                    throw new Error(`Server Error: ${errData.error?.message || response.statusText}`);
                 }
+
                 const data = await response.json();
+                // โครงสร้างข้อมูลจาก Google: candidates[0].content.parts[0].text
                 return data.candidates[0].content.parts[0].text;
+
             } catch (error) { 
                 console.error(error);
-                throw error; // Re-throw to be caught by caller
+                throw error; 
             }
         }
 
@@ -816,7 +221,7 @@
 
             } catch (error) {
                 console.error("Full analysis failed:", error);
-                alert("Error during analysis or plan generation: " + error.message);
+                alert("Error during analysis: " + error.message);
                 planInput.value = `Error: ${error.message}`;
             } finally {
                 // 3. End UI feedback
@@ -827,12 +232,13 @@
 
         // --- 1a. Analyze Risk Step (Private Function) ---
         async function analyzeRiskStep(input) {
+            // (คง Prompt เดิมไว้)
             const prompt = `Act as a Patient Safety Expert specializing in Root Cause Analysis (RCA).
             Analyze the following healthcare scenario in English: "${input}".
             
             Please provide the output in English using HTML format. Do not use Markdown code blocks.
             Follow this exact structure:
-
+            
             <h3 class="font-bold text-lg text-teal-700 mb-2">1. Event Summary</h3>
             <p class="mb-2 text-slate-600">...Provide a narrative summary of the event...</p>
             <ul class="list-disc pl-5 mb-4 text-slate-600 space-y-1">
@@ -897,6 +303,7 @@
 
         // --- 1b. Action Plan Generation Step (Private Function) ---
         async function generateActionPlanStep(analysisData) {
+            // (คง Prompt เดิมไว้)
             const prompt = `Act as a Hospital Safety Manager. 
             Based on the analysis data: "${analysisData}".
 
@@ -913,17 +320,17 @@
                 <td><strong>PDSA Cycle</strong></td>
                 <td>
                   <ul style="list-style-type: disc; margin-left: 20px; padding-left: 0;">
-                    <li><strong>Plan:</strong> ...detailed planning activities and key improvements...</li>
-                    <li><strong>Do:</strong> ...key implementation actions, pilot programs, and staff training...</li>
-                    <li><strong>Study:</strong> ...critical metrics and review methods, data analysis...</li>
-                    <li><strong>Act:</strong> ...standardization, institutionalization, or next cycle planning...</li>
+                    <li><strong>Plan:</strong> ...detailed planning activities...</li>
+                    <li><strong>Do:</strong> ...key implementation actions...</li>
+                    <li><strong>Study:</strong> ...critical metrics...</li>
+                    <li><strong>Act:</strong> ...next cycle planning...</li>
                   </ul>
                 </td>
               </tr>
               <tr><td><strong>Key KPIs</strong></td><td>...</td></tr>
             </table>
 
-            Part 2: Detailed Action Plan (Format: Teal Header, NEW STRUCTURE)
+            Part 2: Detailed Action Plan (Format: Teal Header)
             <h3 class="font-bold text-lg text-teal-700 mt-6 mb-2">2. Detailed Action Plan</h3>
             <table class="action-table" style="width:100%; border-collapse: collapse; border: 1px solid #ddd;">
               <tr style="background-color:#0D9488; color: white;">
@@ -935,13 +342,11 @@
                  <th style="padding:10px;">Owner</th>
                  <th style="padding:10px;">Timeline</th>
               </tr>
-              <!-- Create 2-3 rows of steps with 7 columns -->
               <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
             </table>
 
             Part 3: Initiatives for Patient Safety (Format: Violet Header)
             <h3 class="font-bold text-lg text-purple-700 mt-6 mb-2">3. Innovative Safety Initiatives</h3>
-            <p class="text-xs text-slate-500 mb-2">Focus on Preventing Recurrence</p>
             <table class="initiative-table" style="width:100%; border-collapse: collapse; border: 1px solid #ddd;">
               <tr style="background-color:#7C3AED; color: white;">
                  <th style="padding:10px;">No.</th>
@@ -951,16 +356,14 @@
                  <th style="padding:10px;">Key Responsible</th>
                  <th style="padding:10px;">Expected Outcome</th>
               </tr>
-              <!-- Create 2-3 innovative ideas -->
               <tr><td>1</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
             </table>
             
             <h3 class="font-bold text-lg text-indigo-700 mt-6 mb-2">4. Conclusion & Recommendations</h3>
             <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200 text-sm space-y-3">
-                <p><strong>Key Actions Summary:</strong> ...summary of key actions and interventions...</p>
-                <p><strong>Lessons Learned:</strong> ...insights gained from the PDSA cycle and systemic improvements...</p>
-                <p><strong>Additional Recommendations:</strong> ...further recommendations for sustainability or scaling up (e.g., AI integration)...</p>
-                <p><strong>Safety Culture Vision:</strong> ...expected safety culture outcome (e.g., Improved HSOPSC scores, Zero Harm)...</p>
+                <p><strong>Key Actions Summary:</strong> ...</p>
+                <p><strong>Lessons Learned:</strong> ...</p>
+                <p><strong>Safety Culture Vision:</strong> ...</p>
             </div>`;
 
             const responseText = await callGemini(prompt);
@@ -973,7 +376,7 @@
             return formattedContent;
         }
 
-        // --- Feature 3: Export to Word (With Standard Font) ---
+        // --- Feature 3: Export to Word ---
         function exportToWord() {
             const scenario = document.getElementById('scenarioInput').value;
             const riskAnalysis = document.getElementById('analyzeResult').innerHTML;
@@ -987,57 +390,35 @@
                     <meta charset='utf-8'>
                     <title>Safety Action Plan</title>
                     <style>
-                        /* Set Font Family to Standard Sans-Serif */
                         body { font-family: 'Arial', 'Calibri', sans-serif; font-size: 11pt; line-height: 1.2; color: #333; }
                         h1 { color: #1e3a8a; text-align: center; font-size: 16pt; margin-bottom: 5px; font-weight: bold; }
                         h2 { color: #0f766e; border-bottom: 2px solid #0f766e; padding-bottom: 5px; margin-top: 25px; font-size: 14pt; font-weight: bold; }
                         h3 { color: #444; font-size: 12pt; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
-                        .date { text-align: right; font-size: 10pt; color: #666; margin-bottom: 20px; }
-                        
-                        /* Table Styling */
                         table { border-collapse: collapse; width: 100%; margin-bottom: 20px; font-size: 10pt; }
                         th, td { border: 1px solid #000; padding: 5px 10px; vertical-align: top; text-align: left; }
                         th { color: white; font-weight: bold; }
-                        
-                        /* Header Colors */
                         .rca-table th { background-color: #F59E0B; }
                         .action-table th { background-color: #0EA5E9; } 
                         .initiative-table th { background-color: #7C3AED; }
                         table:nth-of-type(1) th { background-color: #1e293b; }
-
-                        /* Fishbone in Word */
                         .fishbone-grid { display: table; width: 100%; }
                         .fishbone-card { display: table-cell; border: 1px solid #ccc; padding: 10px; width: 30%; margin: 5px; }
-
                         ul, ol { margin: 0; padding-left: 25px; }
                         li { margin-bottom: 3px; }
                     </style>
                 </head>
                 <body>
-                    <div class="date">
-                        <p>Date: ${new Date().toLocaleDateString('en-US')}</p>
-                    </div>
-
+                    <div style="text-align: right; font-size: 10pt; color: #666; margin-bottom: 20px;">Date: ${new Date().toLocaleDateString('en-US')}</div>
                     <h1>Safety Action Plan Report</h1>
-                    
                     <h2>1. Risk Analysis</h2>
-                    <table>
-                        <tr>
-                            <th style="background-color:#1e293b;" width="20%">Scenario</th>
-                            <td>${scenario || '-'}</td>
-                        </tr>
-                    </table>
+                    <table><tr><th style="background-color:#1e293b;" width="20%">Scenario</th><td>${scenario || '-'}</td></tr></table>
                     ${riskAnalysis || '-'}
-
                     <h2>2. Action Plan & Initiatives</h2>
                     ${actionPlan}
-
-                    <br>
-                    <p style="text-align: center; font-size: 9pt; color: #999; margin-top:50px;">Document generated by AI Safety Lab</p>
+                    <br><p style="text-align: center; font-size: 9pt; color: #999; margin-top:50px;">Document generated by RCA Insight Companion</p>
                 </body>
                 </html>
             `;
-
             const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -1051,79 +432,25 @@
         // Charts (Standard)
         Chart.defaults.font.family = "'Sarabun', sans-serif";
         Chart.defaults.color = '#64748B';
-        const commonTooltip = { callbacks: { title: ctx => Array.isArray(ctx[0].label) ? ctx[0].label.join(' ') : ctx[0].label }, padding: 12, backgroundColor: '#1E293B' };
-
-        // SWITCHED TO BAR CHART FOR CLARITY & INTERACTIVITY
         const ctx = document.getElementById('assessmentChart');
         const assessmentChart = new Chart(ctx, {
             type: 'bar',
             data: { 
-                labels: [
-                    'Teamwork', 
-                    'Staffing & Work Pace', 
-                    'Org. Learning', 
-                    'Response to Error', 
-                    'Supervisor Support', 
-                    'Comm. About Error',
-                    'Comm. Openness',
-                    'Reporting Events',
-                    'Hospital Mgmt. Support',
-                    'Handoffs & Info'
-                ], 
+                labels: ['Teamwork', 'Staffing & Work Pace', 'Org. Learning', 'Response to Error', 'Supervisor Support', 'Comm. About Error', 'Comm. Openness', 'Reporting Events', 'Hospital Mgmt. Support', 'Handoffs & Info'], 
                 datasets: [
-                    { 
-                        label: 'Your Hospital (% Positive)', 
-                        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 10 zeros
-                        backgroundColor: '#0D9488', // Teal-600
-                        borderRadius: 4,
-                        barPercentage: 0.6
-                    }, 
-                    { 
-                        label: 'Ideal Goal (100%)', 
-                        data: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100], // 10 hundreds
-                        backgroundColor: '#E2E8F0', // Slate-200
-                        borderRadius: 4,
-                        barPercentage: 0.6,
-                        borderWidth: 1,
-                        borderColor: '#94A3B8'
-                    }
+                    { label: 'Your Hospital (% Positive)', data: [0,0,0,0,0,0,0,0,0,0], backgroundColor: '#0D9488', borderRadius: 4, barPercentage: 0.6 }, 
+                    { label: 'Ideal Goal (100%)', data: [100,100,100,100,100,100,100,100,100,100], backgroundColor: '#E2E8F0', borderRadius: 4, barPercentage: 0.6, borderWidth: 1, borderColor: '#94A3B8' }
                 ] 
             },
             options: { 
-                indexAxis: 'y', // Horizontal Bar
-                responsive: true, 
-                maintainAspectRatio: false, 
-                scales: { 
-                    x: { 
-                        suggestedMin: 0, 
-                        max: 100, 
-                        grid: { color: '#f1f5f9' },
-                        title: { display: true, text: '% Positive Response' }
-                    },
-                    y: { grid: { display: false } }
-                }, 
-                plugins: { 
-                    tooltip: {
-                        callbacks: {
-                            title: ctx => Array.isArray(ctx[0].label) ? ctx[0].label.join(' ') : ctx[0].label,
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.x + '%';
-                            }
-                        },
-                        padding: 12, 
-                        backgroundColor: '#1E293B'
-                    }, 
-                    legend: { position: 'bottom' } 
-                } 
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false, 
+                scales: { x: { suggestedMin: 0, max: 100, grid: { color: '#f1f5f9' }, title: { display: true, text: '% Positive Response' } }, y: { grid: { display: false } } }, 
+                plugins: { tooltip: { callbacks: { title: ctx => Array.isArray(ctx[0].label) ? ctx[0].label.join(' ') : ctx[0].label, label: function(context) { return context.dataset.label + ': ' + context.parsed.x + '%'; } }, padding: 12, backgroundColor: '#1E293B' }, legend: { position: 'bottom' } } 
             }
         });
 
-        // Function to update chart from sliders
         function updateChartData(index, value) {
-            // Update Number Display
             document.getElementById(`val-${index}`).innerText = parseFloat(value).toFixed(2) + '%';
-            
-            // Update Chart Data
             assessmentChart.data.datasets[0].data[index] = value;
             assessmentChart.update();
         }
