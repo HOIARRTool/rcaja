@@ -29,7 +29,8 @@ app.post('/api/generate', async (req, res) => {
 
     // ใช้ Model 1.5 Flash (เสถียรสุด)
     // ใช้ชื่อรุ่นแบบเจาะจง (-latest) เพื่อให้หาเจอแน่นอน
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    // เปลี่ยน v1beta -> v1 และใช้ชื่อรุ่น latest
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
     
     // ตั้งค่า Safety Settings ให้ "BLOCK_NONE" (ปิดการกรอง) 
     // เพื่อให้คุยเรื่อง RCA/การแพทย์/อุบัติเหตุ ได้โดยไม่โดนบล็อก
