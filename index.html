@@ -127,8 +127,7 @@
     </style>
 </head>
 <body class="bg-slate-50">
-
-    <header class="relative w-full h-32 bg-gradient-to-r from-slate-800 to-slate-900 shadow-xl overflow-hidden mb-8 flex items-center justify-center">
+    <header class="relative w-full h-64 bg-gradient-to-r from-slate-800 to-slate-900 shadow-xl overflow-hidden mb-8 flex items-center justify-center">    
         <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
             <div class="absolute top-10 left-10 w-64 h-64 bg-teal-500 rounded-full filter blur-3xl"></div>
             <div class="absolute bottom-10 right-10 w-64 h-64 bg-blue-500 rounded-full filter blur-3xl"></div>
@@ -189,8 +188,8 @@
                                 <p class="text-xs text-slate-500 mb-3">Describe the incident. We will help you visualize the root causes.</p>
                                 <textarea id="scenarioInput" class="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none transition shadow-inner mb-4 bg-white" rows="3" placeholder="Example: Nurse administered wrong medication due to similar packaging and high workload..."></textarea>
                                 
-                                <button id="combinedRunButton" onclick="startFullAnalysis()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg hover:shadow-amber-500/30 flex justify-center items-center gap-2 transform active:scale-95">
-                                    <span id="runSpinner" class="loader hidden border-white border-t-amber-800"></span>
+                                <button id="combinedRunButton" onclick="startFullAnalysis()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg hover:shadow-green-500/30 flex justify-center items-center gap-2 transform active:scale-95">
+                                    <span id="runSpinner" class="loader hidden border-white border-t-green-800"></span>
                                     <span>🔍 Root Cause Analysis</span>
                                 </button>
                                 
@@ -200,11 +199,11 @@
                         <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100 shadow-md relative overflow-hidden h-full">
                             <div class="absolute top-0 right-0 bg-blue-200 text-blue-800 text-[10px] font-bold px-2 py-1 rounded-bl-lg">STEP 2 (Automatic)</div>
                             <h3 class="text-lg font-bold text-blue-900 mb-3 flex items-center gap-2">
-                                <span class="text-2xl">🎯</span> 2. Action Plan & KPIs
+                                <span class="text-2xl">🎯</span> 2. Risk Analysis & Action Plan
                             </h3>
-                            <p class="text-xs text-blue-700 mb-4">The system generates 3 key parts: PDSA, Action Plan, and Initiative Ideas.</p>
+                            <p class="text-xs text-blue-700 mb-4">The system generates 3 key parts: PDSA, Action Plan, Initiative Ideas, and Conclusion & Recommendations.</p>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Input Data:</label>
-                            <textarea id="planInput" class="w-full p-4 border border-blue-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none h-40 bg-white mb-4 shadow-inner font-mono text-slate-600" placeholder="Waiting for analysis results..."></textarea>
+                            <textarea id="planInput" class="w-full p-4 border border-blue-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none h-24 bg-white mb-4 shadow-inner font-mono text-slate-600" placeholder="Waiting for analysis results..."></textarea>
                             <div class="flex gap-2">
                                 <button onclick="exportToWord()" class="w-full bg-white hover:bg-slate-50 text-blue-700 border border-blue-200 font-bold py-3 px-4 rounded-xl transition shadow-md flex justify-center items-center gap-2 transform active:scale-95" title="Export to Word">
                                     <span class="text-lg">📄</span>
