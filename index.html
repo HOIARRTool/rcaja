@@ -143,14 +143,12 @@
     
       <div class="absolute top-6 right-6 flex items-center gap-4 z-20">            
         <div class="flex gap-2">
-        <a href="https://rca-th.onrender.com/" target="_blank" rel="noopener noreferrer" title="タイのツールを開く">
-          <img src="https://flagcdn.com/h40/th.png" alt="Thailand" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
-        </a>    
-          <img src="https://flagcdn.com/h40/tw.png" alt="Taiwan" title="Taiwan" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
-          <img src="https://flagcdn.com/h40/mm.png" alt="Myanmar" title="Myanmar" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
-          <img src="https://flagcdn.com/h40/ph.png" alt="Philippines" title="Philippines" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
-          <img src="https://flagcdn.com/h40/my.png" alt="Malaysia" title="Malaysia" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
-          <img src="https://flagcdn.com/h40/bn.png" alt="Brunei" title="Brunei" class="h-6 rounded shadow-lg opacity-90 hover:opacity-100 hover:scale-110 transition-transform duration-200">
+          <img src="https://flagcdn.com/h40/th.png" alt="Thailand" class="h-6 rounded shadow-lg">
+          <img src="https://flagcdn.com/h40/tw.png" alt="Taiwan" class="h-6 rounded shadow-lg">
+          <img src="https://flagcdn.com/h40/mm.png" alt="Myanmar" class="h-6 rounded shadow-lg">
+          <img src="https://flagcdn.com/h40/ph.png" alt="Philippines" class="h-6 rounded shadow-lg">
+          <img src="https://flagcdn.com/h40/my.png" alt="Malaysia" class="h-6 rounded shadow-lg">
+          <img src="https://flagcdn.com/h40/bn.png" alt="Brunei" class="h-6 rounded shadow-lg">
         </div>
       </div>
     </header>
@@ -171,7 +169,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-
                         <div class="space-y-6">
                             <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition duration-300">
                                 <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
@@ -180,7 +177,7 @@
                                 <p class="text-xs text-slate-500 mb-3">事象の経過を記述してください。根本原因の可視化をサポートします。</p>
                                 <textarea id="scenarioInput" class="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none transition shadow-inner mb-4 bg-white" rows="6" placeholder="例：包装の類似と過度な業務量により、看護師が誤った薬剤を投与した..."></textarea>
                                 
-                                <button id="combinedRunButton" onclick="startFullAnalysis()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg hover:shadow-green-500/30 flex justify-center items-center gap-2 transform active:scale-95">
+                                <button id="combinedRunButton" onclick="startFullAnalysis()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg flex justify-center items-center gap-2 transform active:scale-95">
                                     <span id="runSpinner" class="loader hidden border-white border-t-green-800"></span>
                                     <span>🔍 根本原因分析 (RCA) を実行</span>
                                 </button>
@@ -198,9 +195,9 @@
                             </h3>
                             <p class="text-xs text-blue-700 mb-4">PDSA、アクションプラン、改善策、および結論・提言を自動生成します。</p>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">入力データ：</label>
-                            <textarea id="planInput" class="w-full p-4 border border-blue-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none h-24 bg-white mb-4 shadow-inner font-mono text-slate-600" placeholder="分析結果を待機中..."></textarea>
+                            <textarea id="planInput" class="w-full p-4 border border-blue-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none h-24 bg-white mb-4 shadow-inner font-mono text-slate-600" placeholder="分析結果を待機中..." readonly></textarea>
                             <div class="flex gap-2">
-                                <button onclick="exportToWord()" class="w-full bg-white hover:bg-slate-50 text-blue-700 border border-blue-200 font-bold py-3 px-4 rounded-xl transition shadow-md flex justify-center items-center gap-2 transform active:scale-95" title="Word出力">
+                                <button onclick="exportToWord()" class="w-full bg-white hover:bg-slate-50 text-blue-700 border border-blue-200 font-bold py-3 px-4 rounded-xl transition shadow-md flex justify-center items-center gap-2 transform active:scale-95">
                                     <span class="text-lg">📄</span>
                                     <span class="md:inline">Wordドキュメントを出力</span>
                                 </button>
@@ -210,15 +207,8 @@
                               <div id="planResult" class="hidden p-5 text-sm text-slate-700 min-h-[100px] overflow-x-auto"></div>
                             </div>
                         </div>
-
                     </div>
                 </div>
-            </div>
-            
-            <div class="mt-20 flex items-center justify-center">
-                <div class="h-px w-24 bg-slate-300"></div>
-                <span class="px-4 text-slate-400 text-sm font-semibold tracking-wider uppercase">ナレッジ・ディープダイブ</span>
-                <div class="h-px w-24 bg-slate-300"></div>
             </div>
         </section>
 
@@ -226,147 +216,47 @@
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-slate-800">1. コア・コンセプトの詳細解説</h2>
                 <div class="h-1 w-20 bg-teal-500 mx-auto mt-4 rounded-full"></div>
-                <p class="text-slate-600 mt-4 max-w-3xl mx-auto">
-                    医療安全の6つの柱を理解し、個人を責めるのではなく、事故が「どのように発生し」「どう予防できるか」を可視化します。
-                </p>
+                <p class="text-slate-600 mt-4 max-w-3xl mx-auto">医療安全の6つの柱を理解し、事故をシステム的に予防します。</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-cyan-500 hover:shadow-xl transition group">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-cyan-500">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="text-4xl">🐟</span>
                         <h3 class="font-bold text-2xl text-slate-800">1. 魚骨図 (石川図)</h3>
                     </div>
-                    <p class="text-slate-600 leading-relaxed mb-6">
-                        <strong>石川馨博士 (Dr. Kaoru Ishikawa)</strong> が開発したRCAツールです。ヘルスケア分野では <strong>6M</strong> に注目します。
-                    </p>
-                    
                     <div class="w-full overflow-hidden bg-slate-50 rounded-xl border border-slate-200 p-2 mb-4 flex justify-center">
-                        <svg viewBox="0 0 800 350" class="w-full h-auto drop-shadow-sm">
+                        <svg viewBox="0 0 800 350" class="w-full h-auto">
                             <line x1="50" y1="175" x2="650" y2="175" stroke="#334155" stroke-width="4" />
                             <polygon points="650,130 790,175 650,220" fill="#0EA5E9" />
-                            <text x="705" y="172" font-family="sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">問題</text>
-                            <text x="705" y="195" font-family="sans-serif" font-size="12" fill="#E0F2FE" text-anchor="middle">(結果)</text>
+                            <text x="705" y="172" font-size="16" font-weight="bold" fill="white" text-anchor="middle">問題</text>
                             <line x1="150" y1="50" x2="200" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="100" y="20" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="150" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">人 (Man)</text>
+                            <text x="150" y="40" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">人 (Man)</text>
                             <line x1="350" y1="50" x2="400" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="300" y="20" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="350" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">機 (Machine)</text>
+                            <text x="350" y="40" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">機 (Machine)</text>
                             <line x1="550" y1="50" x2="600" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="500" y="20" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="550" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">法 (Method)</text>
+                            <text x="550" y="40" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">法 (Method)</text>
                             <line x1="150" y1="300" x2="200" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="100" y="300" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="150" y="320" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">料 (Material)</text>
+                            <text x="150" y="320" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">料 (Material)</text>
                             <line x1="450" y1="300" x2="500" y2="175" stroke="#64748B" stroke-width="2" />
-                            <rect x="400" y="300" width="120" height="30" rx="5" fill="white" stroke="#64748B" />
-                            <text x="460" y="320" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">環 (Environment)</text>
+                            <text x="460" y="320" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">環 (Environment)</text>
                         </svg>
                     </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600 bg-cyan-50 p-4 rounded-xl border border-cyan-100">
-                        <div><strong class="text-cyan-800">1. 人 (Man):</strong> 能力、疲労、ストレス、配置、教育。</div>
-                        <div><strong class="text-cyan-800">2. 機 (Machine):</strong> 装置故障、校正、保守、設計。</div>
-                        <div><strong class="text-cyan-800">3. 法 (Method):</strong> 不明瞭なSOP、古い指針、通信手順。</div>
-                        <div><strong class="text-cyan-800">4. 料 (Material):</strong> 薬剤欠陥、包装類似、消耗品品質。</div>
-                        <div><strong class="text-cyan-800">5. 環 (Environment):</strong> 騒音、照明、配置、割り込み。</div>
-                        <div><strong class="text-cyan-800">6. 測 (Measurement):</strong> データの正確性、検査値の解釈。</div>
-                    </div>
                 </div>
 
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-pink-500 hover:shadow-xl transition group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-4xl">❓</span>
-                        <h3 class="font-bold text-2xl text-slate-800">2. なぜなぜ分析 (5 Whys)</h3>
-                    </div>
-                    <p class="text-slate-600 leading-relaxed mb-4">
-                        <strong>豊田佐吉 (Sakichi Toyoda)</strong> が考案。5回の「なぜ」を繰り返すことで、真の根本原因を特定します。
-                    </p>
-                    <div class="bg-pink-50 p-4 rounded-lg border border-pink-100">
-                        <strong class="text-pink-800 block mb-2 text-sm">例：患者の転倒</strong>
-                        <div class="space-y-0">
-                            <div class="why-step"><div class="why-number">1</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ？床が濡れていた。</div></div>
-                            <div class="why-step"><div class="why-number">2</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ？配管から水が漏れていた。</div></div>
-                            <div class="why-step"><div class="why-number">3</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ？パッキンが破損していた。</div></div>
-                            <div class="why-step"><div class="why-number">4</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ？安価なパッキンを購入した。</div></div>
-                            <div class="why-step"><div class="why-number">5</div><div class="text-sm text-slate-700 pt-1 font-bold text-pink-700">根本原因：品質より価格を優先した調達方針。</div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-green-600 hover:shadow-xl transition group">
-                  <div class="flex items-center gap-3 mb-4">
-                    <span class="text-4xl">🎄</span>
-                    <h3 class="font-bold text-2xl text-slate-800">3. フォルトツリー分析 (FTA)</h3>
-                  </div>
-                  <p class="text-xs text-slate-500 mb-3">故障経路の視覚化</p>
-                  <div class="bg-green-50 p-6 rounded-xl border border-green-200 flex flex-col items-center overflow-x-auto">
-                    <div class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md z-10 text-center">頂上事象 (事故)</div>
-                    <div class="h-6 w-0.5 bg-slate-400"></div>
-                    <div class="bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded z-10 relative">ORゲート</div>
-                    <div class="h-4 w-0.5 bg-slate-400"></div>
-                    <div class="w-64 h-0.5 bg-slate-400"></div>
-                    <div class="flex justify-between w-full max-w-md gap-4">
-                      <div class="flex flex-col items-center w-1/2">
-                        <div class="h-4 w-0.5 bg-slate-400"></div>
-                        <div class="bg-white border-2 border-green-500 text-green-800 px-3 py-2 rounded-lg text-xs font-bold shadow-sm text-center">直接原因 A</div>
-                      </div>
-                      <div class="flex flex-col items-center w-1/2">
-                        <div class="h-4 w-0.5 bg-slate-400"></div>
-                        <div class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded z-10 relative">ANDゲート</div>
-                        <div class="h-4 w-0.5 bg-slate-400"></div>
-                        <div class="w-24 h-0.5 bg-slate-400"></div>
-                        <div class="flex justify-between w-full gap-2">
-                          <div class="flex flex-col items-center"><div class="h-3 w-0.5 bg-slate-400"></div><div class="bg-white border border-green-500 text-green-700 px-2 py-1 rounded text-[10px] text-center">基本原因 1</div></div>
-                          <div class="flex flex-col items-center"><div class="h-3 w-0.5 bg-slate-400"></div><div class="bg-white border border-green-500 text-green-700 px-2 py-1 rounded text-[10px] text-center">基本原因 2</div></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-amber-500 hover:shadow-xl transition group">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-amber-500">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="text-4xl">🧀</span>
                         <h3 class="font-bold text-2xl text-slate-800">4. スイスチーズモデル</h3>
                     </div>
-                    <p class="text-slate-600 leading-relaxed mb-6">
-                        <strong>ジェームズ・リーズン (James Reason)</strong> 提唱。多層の防御壁にある「穴」が重なったときに事故は発生します。
-                    </p>
                     <div class="w-full overflow-hidden bg-slate-50 rounded-xl border border-slate-200 p-6 mb-6 flex justify-center">
-                        <svg viewBox="0 0 800 320" class="w-full h-auto drop-shadow-sm">
-                            <defs><marker id="arrowRed" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#EF4444" /></marker></defs>
-                            <line x1="50" y1="140" x2="720" y2="140" stroke="#EF4444" stroke-width="4" stroke-dasharray="10,5" marker-end="url(#arrowRed)" />
-                            <text x="50" y="120" font-family="sans-serif" font-size="14" font-weight="bold" fill="#EF4444">危険 (HAZARD)</text>
-                            <g transform="translate(150, 40)"><rect x="0" y="0" width="70" height="200" rx="4" fill="#FEF3C7" stroke="#334155" stroke-width="2" /><circle cx="35" cy="100" r="15" fill="white" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,2" /><text x="35" y="230" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">組織</text></g>
-                            <g transform="translate(300, 40)"><rect x="0" y="0" width="70" height="200" rx="4" fill="#FDE68A" stroke="#334155" stroke-width="2" /><circle cx="35" cy="100" r="15" fill="white" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,2" /><text x="35" y="230" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">管理</text></g>
-                            <g transform="translate(450, 40)"><rect x="0" y="0" width="70" height="200" rx="4" fill="#FCD34D" stroke="#334155" stroke-width="2" /><circle cx="35" cy="100" r="15" fill="white" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,2" /><text x="35" y="230" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">前提</text></g>
-                            <g transform="translate(600, 40)"><rect x="0" y="0" width="70" height="200" rx="4" fill="#F59E0B" stroke="#334155" stroke-width="2" /><circle cx="35" cy="100" r="15" fill="white" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,2" /><text x="35" y="230" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">行為</text></g>
-                            <g transform="translate(740, 140)"><path d="M0 -20 L5 -5 L20 0 L5 5 L0 20 L-5 5 L-20 0 L-5 -5 Z" fill="#EF4444" stroke="#991B1B" stroke-width="2" /><text x="0" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#EF4444" text-anchor="middle">損失</text></g>
+                        <svg viewBox="0 0 800 320" class="w-full h-auto">
+                            <line x1="50" y1="140" x2="720" y2="140" stroke="#EF4444" stroke-width="4" stroke-dasharray="10,5" />
+                            <g transform="translate(150, 40)"><rect x="0" y="0" width="70" height="200" rx="4" fill="#FEF3C7" stroke="#334155" stroke-width="2" /><text x="35" y="230" font-size="12" font-weight="bold" text-anchor="middle">組織</text></g>
+                            <g transform="translate(300, 40)"><rect x="0" y="0" width="70" height="200" rx="4" fill="#FDE68A" stroke="#334155" stroke-width="2" /><text x="35" y="230" font-size="12" font-weight="bold" text-anchor="middle">管理</text></g>
+                            <g transform="translate(450, 40)"><rect x="0" y="0" width="70" height="200" rx="4" fill="#FCD34D" stroke="#334155" stroke-width="2" /><text x="35" y="230" font-size="12" font-weight="bold" text-anchor="middle">現場</text></g>
+                            <g transform="translate(600, 40)"><rect x="0" y="0" width="70" height="200" rx="4" fill="#F59E0B" stroke="#334155" stroke-width="2" /><text x="35" y="230" font-size="12" font-weight="bold" text-anchor="middle">行為</text></g>
                         </svg>
-                    </div>
-                </div>
-
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-teal-500 hover:shadow-xl transition group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-4xl">⚖️</span>
-                        <h3 class="font-bold text-2xl text-slate-800">5. 正当な文化 (Just Culture)</h3>
-                    </div>
-                    <p class="text-slate-600 leading-relaxed mb-4">3つの行動を区別し、適切に管理します。</p>
-                    <div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-600 border border-slate-200 rounded-lg"><thead class="bg-slate-100 text-slate-700 font-bold"><tr><th class="p-2 border-b">行動</th><th class="p-2 border-b">対応</th></tr></thead><tbody><tr class="border-b bg-green-50"><td class="p-2 font-bold text-green-700">ヒューマンエラー</td><td class="p-2">慰め・支援</td></tr><tr class="border-b bg-yellow-50"><td class="p-2 font-bold text-yellow-700">リスク行為</td><td class="p-2">指導・コーチ</td></tr><tr class="bg-red-50"><td class="p-2 font-bold text-red-700">無謀な行為</td><td class="p-2">処分</td></tr></tbody></table></div>
-                </div>
-
-                 <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-blue-500 hover:shadow-xl transition group">
-                    <div class="flex items-center gap-3 mb-4"><span class="text-4xl">📐</span> <h3 class="font-bold text-2xl text-slate-800">6. 人間工学 (Human Factors)</h3></div>
-                    <p class="text-slate-600 leading-relaxed mb-4">人間を変えるのではなく、人間の限界に合わせて<strong>システムを設計</strong>することに注力します。</p>
-                    <div class="bg-blue-50 p-5 rounded-xl border border-blue-100 text-sm">
-                        <strong class="text-blue-800 block mb-3 text-base">主要戦略：</strong>
-                        <ul class="space-y-3">
-                            <li class="flex items-start gap-3"><div class="bg-white p-1 rounded border border-blue-200 shadow-sm text-lg">🔒</div><div><strong class="text-slate-700">強制機能</strong><p class="text-slate-500 text-xs">誤り不可能な設計（例：物理的に接続できない端子）。</p></div></li>
-                            <li class="flex items-start gap-3"><div class="bg-white p-1 rounded border border-blue-200 shadow-sm text-lg">📏</div><div><strong class="text-slate-700">標準化</strong><p class="text-slate-500 text-xs">配置の一貫性により認知負荷を軽減。</p></div></li>
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -376,30 +266,10 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <div class="lg:col-span-5 space-y-6">
                     <h2 class="text-3xl font-bold text-slate-800">2. アセスメントと現状評価</h2>
-                    <div class="h-1 w-20 bg-teal-500 rounded-full"></div>
-                    <p class="text-slate-600 leading-relaxed font-light italic border-l-4 border-teal-500 pl-4 bg-teal-50/50 p-2 rounded-r-lg">
-                        "<strong>AHRQ HSOPSC 2.0</strong> に基づく評価。肯定的回答率(%)を入力し、理想(100%)との乖離を分析してください。"
-                    </p>
-                    
-                    <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 max-h-[500px] overflow-y-auto">
-                        <h4 class="text-xs font-bold text-slate-500 uppercase mb-3 tracking-wide flex items-center gap-2 sticky top-0 bg-slate-100 py-2 border-b"><span>🎚️</span> 各項目のスコア入力</h4>
-                        <div class="space-y-4 text-sm" id="assessmentControls"></div>
-                    </div>
-
-                    <div class="chart-container mt-6"><canvas id="assessmentChart"></canvas></div>
+                    <div id="assessmentControls" class="bg-slate-100 p-4 rounded-xl max-h-[500px] overflow-y-auto space-y-4"></div>
                 </div>
-
-                <div class="lg:col-span-7 space-y-6">
-                    <h3 class="font-bold text-slate-700 border-l-4 border-teal-500 pl-4">ギャップ分析と推奨策</h3>
-                    <div class="space-y-4">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <div class="flex items-start gap-3"><div class="bg-red-100 text-red-600 p-2 rounded-lg font-bold text-xl">⚠️</div>
-                                <div><h4 class="font-bold text-slate-800">非罰則的なエラー対応</h4><p class="text-sm text-slate-600 mt-1"><strong>課題：</strong> 処罰への恐怖が報告を妨げ、リスクが潜在化している。</p>
-                                    <div class="mt-3 bg-white p-3 rounded border border-slate-200 text-sm"><strong class="text-teal-600">✅ 解決策：</strong><ul class="list-disc list-inside text-slate-500 mt-1"><li>「正当な文化」の導入。</li><li>代用テストの実施。</li></ul></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="lg:col-span-7">
+                    <div class="chart-container"><canvas id="assessmentChart"></canvas></div>
                 </div>
             </div>
         </section>
@@ -411,102 +281,123 @@
 
     </main>
 
-    <footer class="bg-slate-900 py-12 border-t border-slate-800 mt-12 text-center text-slate-400 text-sm">
-        <p>ASEAN諸国の医療の質向上を目指すASQuaイニシアチブ。</p>
-        <p>開発者: Krittichat Kamjornpreecha & Wilasinee Kueankaew | Supported by Gemini</p>
+    <footer class="bg-slate-900 py-12 text-center text-slate-400 text-sm">
+        <p>ASQua 医療安全プロジェクト | Saga AI サポート</p>
     </footer>
 
     <script>
-        // --- Core Gemini API Proxy ---
+        // --- Core Functions ---
         async function callGemini(prompt) {
-            try {
-                const response = await fetch('/api/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: prompt })
-                });
-                const data = await response.json();
-                return data.candidates[0].content.parts[0].text;
-            } catch (error) { throw error; }
+            const res = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+            const data = await res.json();
+            return data.candidates[0].content.parts[0].text;
         }
 
-        // --- Assessment & Roadmaps Generation (Japanese) ---
-        const assessmentLabels = ['チームワーク', '人員配置と業務ペース', '組織学習', 'エラーへの対応', '上司の支援', 'エラーに関する意思疎通', 'コミュニケーションの開放性', '事象報告の頻度', '管理層の支援', '交接と情報交換'];
-        document.getElementById('assessmentControls').innerHTML = assessmentLabels.map((l, i) => `
+        async function startFullAnalysis() {
+            const input = document.getElementById('scenarioInput').value;
+            const btn = document.getElementById('combinedRunButton');
+            const spinner = document.getElementById('runSpinner');
+            const resDiv = document.getElementById('analyzeResult');
+            const pInput = document.getElementById('planInput');
+            const pResDiv = document.getElementById('planResult');
+
+            if (!input.trim()) return alert("シナリオを入力してください。");
+
+            btn.disabled = true; spinner.classList.remove('hidden');
+            pInput.value = '日本語で分析中...';
+
+            try {
+                // STEP 1: RCA
+                const rcaPrompt = `医療安全管理者として、以下の事例をRCA分析してください： "${input}"。必ず【日本語（敬体）】で出力。Markdown不可、HTMLタグのみ使用。1.事象要約(h3) 2.時系列 3.魚骨図(fishbone-card構造) 4.なぜなぜ分析(why-step構造) 5.スイスチーズ分析(rca-table)`;
+                const rcaHtml = (await callGemini(rcaPrompt)).replace(/```html/g,'').replace(/```/g,'');
+                resDiv.innerHTML = rcaHtml; resDiv.classList.remove('hidden');
+
+                // STEP 2: Action Plan (Forced Table)
+                pInput.value = '改善計画のテーブルを生成中...';
+                const pPrompt = `以下のRCA分析に基づき、医療安全改善計画を作成してください： "${rcaHtml}"
+                必ず【日本語（敬体）】で出力し、HTML形式で回答してください。Markdownコードブロック( \`\`\` )は絶対に使わないでください。
+
+                以下の構成を厳守してください：
+                1. <h3>1. PDSA戦略サマリー</h3>
+                <table class="action-table">
+                    <thead><tr><th>項目</th><th>内容</th></tr></thead>
+                    <tbody>
+                        <tr><td>目標</td><td>...</td></tr>
+                        <tr><td>Plan (計画)</td><td>...</td></tr>
+                        <tr><td>Do (実行)</td><td>...</td></tr>
+                        <tr><td>Study (学習)</td><td>...</td></tr>
+                        <tr><td>Act (改善)</td><td>...</td></tr>
+                    </tbody>
+                </table>
+
+                2. <h3>2. 詳細アクションプラン</h3>
+                <table class="action-table">
+                    <thead><tr><th>目標</th><th>ステップ</th><th>KPI</th><th>責任者</th><th>期限</th></tr></thead>
+                    <tbody><tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr></tbody>
+                </table>
+
+                3. <h3>3. 結論と提言</h3>
+                (箇条書きで記述)`;
+
+                const pHtml = (await callGemini(pPrompt)).replace(/```html/g,'').replace(/```/g,'');
+                pResDiv.innerHTML = pHtml; pResDiv.classList.remove('hidden');
+                pInput.value = '✔ 解析と計画の作成が完了しました';
+                pResDiv.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (e) { alert("エラー: " + e.message); }
+            finally { btn.disabled = false; spinner.classList.add('hidden'); }
+        }
+
+        // --- UI Setup ---
+        const items = ['チームワーク', '人員配置', '組織学習', 'エラー対応', '上司支援', '意思疎通', '開放性', '報告頻度', '経営層支援', '情報伝達'];
+        document.getElementById('assessmentControls').innerHTML = items.map((t, i) => `
             <div>
-                <div class="flex justify-between mb-1"><label class="text-slate-700 font-semibold text-xs">${i+1}. ${l}</label><span id="val-${i}" class="text-teal-600 font-bold text-xs">0%</span></div>
-                <input type="range" min="0" max="100" value="0" class="w-full h-2 bg-slate-300 rounded-lg accent-teal-500" oninput="updateChartData(${i}, this.value)">
-            </div>`).join('');
+                <div class="flex justify-between text-xs font-bold mb-1"><label>${t}</label><span id="v-${i}">0%</span></div>
+                <input type="range" min="0" max="100" value="0" class="w-full h-2 bg-slate-300 rounded-lg accent-teal-600" oninput="upd(${i}, this.value)">
+            </div>
+        `).join('');
+
+        const ctx = document.getElementById('assessmentChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: items, datasets: [{ label: '現在のスコア (%)', data: Array(10).fill(0), backgroundColor: '#0D9488' }, { label: '理想 (100%)', data: Array(10).fill(100), backgroundColor: '#E2E8F0' }] },
+            options: { indexAxis: 'y', scales: { x: { max: 100 } } }
+        });
+
+        function upd(i, v) { document.getElementById(`v-${i}`).innerText = v + '%'; chart.data.datasets[0].data[i] = v; chart.update(); }
 
         const roadmapData = [
-            { phase: "第1フェーズ：信頼構築", duration: "1-3ヶ月", activities: ["経営層によるラウンド実施", "非罰則ポリシーの明文化"] },
-            { phase: "第2フェーズ：報告体制の整備", duration: "4-6ヶ月", activities: ["インシデント報告フォームの簡素化", "グッド・キャッチ賞の導入"] },
-            { phase: "第3フェーズ：持続的学習", duration: "7ヶ月以降", activities: ["安全カンファレンスの定例化", "RCA手法の定着"] }
+            { phase: "第1フェーズ：信頼構築", duration: "1-3ヶ月", activities: ["経営層によるラウンド", "非罰則ポリシー明文化"] },
+            { phase: "第2フェーズ：報告体制の整備", duration: "4-6ヶ月", activities: ["報告フォームの簡素化", "グッド・キャッチ賞導入"] },
+            { phase: "第3フェーズ：持続的学習", duration: "7ヶ月以降", activities: ["安全カンファレンス定例化", "RCA手法の定着"] }
         ];
         document.getElementById('roadmapContainer').innerHTML = roadmapData.map((r, i) => `
             <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
                 <div class="${i%2===0 ? 'md:text-right md:pr-12' : 'hidden md:block'} order-1">
                     ${i%2===0 ? `<div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-teal-500">
-                        <h3 class="text-xl font-bold text-teal-700">${r.phase}</h3><span class="text-xs font-bold text-slate-400 uppercase">${r.duration}</span>
+                        <h3 class="text-xl font-bold text-teal-700">${r.phase}</h3><span class="text-xs font-bold text-slate-400">${r.duration}</span>
                         <ul class="text-sm text-slate-600 mt-3 space-y-2">${r.activities.map(a => `<li>🔹 ${a}</li>`).join('')}</ul>
                     </div>` : ''}
                 </div>
-                <div class="absolute left-0 md:left-1/2 -translate-x-1/2 top-6 w-10 h-10 bg-blue-500 rounded-full border-4 border-white shadow-md z-10 flex items-center justify-center text-white font-bold">${i+1}</div>
+                <div class="absolute left-0 md:left-1/2 -translate-x-1/2 top-6 w-10 h-10 bg-blue-500 rounded-full border-4 border-white z-10 flex items-center justify-center text-white font-bold">${i+1}</div>
                 <div class="${i%2!==0 ? 'md:pl-12' : 'hidden md:block'} order-2">
                     ${i%2!==0 ? `<div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500">
-                        <h3 class="text-xl font-bold text-blue-700">${r.phase}</h3><span class="text-xs font-bold text-slate-400 uppercase">${r.duration}</span>
+                        <h3 class="text-xl font-bold text-blue-700">${r.phase}</h3><span class="text-xs font-bold text-slate-400">${r.duration}</span>
                         <ul class="text-sm text-slate-600 mt-3 space-y-2">${r.activities.map(a => `<li>🔹 ${a}</li>`).join('')}</ul>
                     </div>` : ''}
                 </div>
             </div>`).join('');
 
-        const ctx = document.getElementById('assessmentChart').getContext('2d');
-        const assessmentChart = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: assessmentLabels, datasets: [{ label: '現在のスコア', data: Array(10).fill(0), backgroundColor: '#0D9488' }, { label: '理想目標 (100%)', data: Array(10).fill(100), backgroundColor: '#E2E8F0' }] },
-            options: { indexAxis: 'y', scales: { x: { max: 100 } } }
-        });
-        function updateChartData(i, v) { document.getElementById(`val-${i}`).innerText = v + '%'; assessmentChart.data.datasets[0].data[i] = v; assessmentChart.update(); }
-
-        // --- AI Analysis Logic ---
-        async function startFullAnalysis() {
-            const input = document.getElementById('scenarioInput').value;
-            const btn = document.getElementById('combinedRunButton');
-            const spinner = document.getElementById('runSpinner');
-            const rcaDiv = document.getElementById('analyzeResult');
-            const pInput = document.getElementById('planInput');
-            const pDiv = document.getElementById('planResult');
-
-            if (!input.trim()) return alert("シナリオを入力してください。");
-            btn.disabled = true; spinner.classList.remove('hidden');
-            pInput.value = '日本語で詳細分析と計画を作成しています...';
-
-            try {
-                // STEP 1: RCA Japanese
-                const rcaPrompt = `医療安全の専門家として以下の事例をRCA分析してください： "${input}"。
-                必ず【日本語（敬体）】で出力。HTMLのみ（Markdown不可）。
-                1.事象要約(h3) 2.時系列 3.魚骨図(fishbone-card構造) 4.なぜなぜ分析(why-step構造) 5.スイスチーズ(rca-table)`;
-                const rcaHtml = (await callGemini(rcaPrompt)).replace(/```html/g,'').replace(/```/g,'');
-                rcaDiv.innerHTML = rcaHtml; rcaDiv.classList.remove('hidden');
-
-                // STEP 2: Action Plan Japanese
-                pInput.value = '分析完了。改善計画を生成しています...';
-                const pPrompt = `分析結果 "${rcaHtml}" に基づき、改善計画を作成してください。
-                必ず【日本語（敬体）】で出力。1.PDSA表(action-table) 2.詳細アクションプラン 3.結論`;
-                const pHtml = (await callGemini(pPrompt)).replace(/```html/g,'').replace(/```/g,'');
-                pDiv.innerHTML = pHtml; pDiv.classList.remove('hidden');
-                pInput.value = '✔ 解析と計画の作成が成功しました';
-                pDiv.scrollIntoView({ behavior: 'smooth' });
-            } catch (e) { alert("エラー: " + e.message); }
-            finally { btn.disabled = false; spinner.classList.add('hidden'); }
-        }
-
         function exportToWord() {
-            const html = `<html><body style="font-family:sans-serif;">${document.getElementById('planResult').innerHTML}</body></html>`;
+            const html = `<html><meta charset="utf-8"><body>${document.getElementById('planResult').innerHTML}</body></html>`;
             const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'RCA_改善計画報告書.doc'; link.click();
+            link.download = '医療安全改善計画書.doc'; link.click();
         }
     </script>
 </body>
