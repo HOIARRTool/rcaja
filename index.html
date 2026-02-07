@@ -23,7 +23,7 @@
                     <div class="text-center mb-10">
                         <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">インタラクティブ・サポート</span>
                         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mt-4 mb-2 flex items-center justify-center gap-3">
-                            <span>✨</span> RCA インサイト・コンパニอน
+                            <span>✨</span> RCA インサイト・コンパニオン
                         </h2>
                         <p class="text-slate-500 max-w-2xl mx-auto">
                             深い学習、根本原因分析、そして共により安全なシステムを構築するための、あなたの心強いパートナー。
@@ -39,10 +39,11 @@
                                 </h3>
                                 <textarea id="scenarioInput" class="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-4 bg-white" rows="6" placeholder="インシデントの内容を入力してください..."></textarea>
                                 
-                                <button onclick="startFullAnalysis()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex justify-center items-center gap-2">
+                                <button id="combinedRunButton" onclick="startFullAnalysis()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex justify-center items-center gap-2 transform active:scale-95">
+                                    <span id="runSpinner" class="loader hidden border-white border-t-transparent"></span>
                                     <span>🔍 RCA分析を開始</span>
                                 </button>
-                                <div id="analyzeResult" class="hidden mt-4 p-4 text-sm text-slate-700 bg-white rounded-xl border border-amber-100"></div>
+                                <div id="analyzeResult" class="hidden mt-4 p-4 text-sm text-slate-700 bg-white rounded-xl border border-amber-100 overflow-x-auto"></div>
                             </div>
                         </div>
                         </div>
@@ -749,43 +750,48 @@
 
         async function startFullAnalysis() {
             const input = document.getElementById('scenarioInput').value;
-            const runButton = document.getElementById('combinedRunButton');
-            const spinner = document.getElementById('runSpinner');
+            const runButton = document.getElementById('combinedRunButton'); // ตรงนี้ต้องตรงกับ ID ปุ่มข้างบน
+            const spinner = document.getElementById('runSpinner'); // ตรงนี้ต้องตรงกับ ID ของ span
             const resultDiv = document.getElementById('analyzeResult');
             const planInput = document.getElementById('planInput');
             const planResultDiv = document.getElementById('planResult');
             
-            if (!input.trim()) { alert("シナリオを入力してください。"); return; }
-
+            if (!input.trim()) { alert("内容を入力してください"); return; }
+        
+            // เริ่มการทำงาน: ปิดปุ่ม และโชว์ตัวหมุน
             runButton.disabled = true;
             spinner.classList.remove('hidden');
             resultDiv.classList.add('hidden');
             planResultDiv.classList.add('hidden');
-            planResultDiv.innerHTML = '';
-            planInput.value = '分析中およびプラン生成中... しばらくお待ちください。';
-
+            planInput.value = '分析中...';
+        
             try {
-                const analysisData = await analyzeRiskStep(input);
-                resultDiv.innerHTML = analysisData.html;
+                // ส่วนนี้สั่งให้ AI วิเคราะห์
+                const promptAnalysis = `Act as a Patient Safety Expert. Analyze this scenario in Japanese HTML: "${input}". Include: 1. Event Summary, 2. Timeline, 3. Fishbone (using <div class="fishbone-grid">), 4. 5 Whys.`;
+                const resText = await callGemini(promptAnalysis);
+                const htmlContent = resText.replace(/```html/g, '').replace(/```/g, '');
+                
+                resultDiv.innerHTML = htmlContent;
                 resultDiv.classList.remove('hidden');
                 
-                const autoFilledContent = `[Scenario]\n${input}\n\n[Risk Analysis Results]\n${analysisData.cleanText}`;
-                planInput.value = autoFilledContent;
+                // เตรียมข้อมูลส่งต่อให้ Step 2
+                const cleanText = resultDiv.innerText;
+                planInput.value = 'アクションプラン生成中...';
                 
-                planInput.value = '分析完了... 詳細なアクションプランを生成中...';
-                const actionPlanHTML = await generateActionPlanStep(autoFilledContent);
-
-                planResultDiv.innerHTML = actionPlanHTML;
+                const promptPlan = `Based on: "${cleanText}", create a PDSA Action Plan in Japanese HTML with tables.`;
+                const resPlan = await callGemini(promptPlan);
+                const planHtml = resPlan.replace(/```html/g, '').replace(/```/g, '');
+                
+                planResultDiv.innerHTML = planHtml;
                 planResultDiv.classList.remove('hidden');
-
-                planInput.value = '✔ アクションプランが正常に生成されました';
-                planResultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
+                planInput.value = '✔ 完了しました';
+        
             } catch (error) {
-                console.error("Analysis failed:", error);
-                alert("エラーが発生しました: " + error.message);
-                planInput.value = `エラー: ${error.message}`;
+                console.error(error);
+                alert("エラー: " + error.message);
+                planInput.value = "Failed";
             } finally {
+                // จบการทำงาน: เปิดปุ่ม และซ่อนตัวหมุน
                 spinner.classList.add('hidden');
                 runButton.disabled = false;
             }
