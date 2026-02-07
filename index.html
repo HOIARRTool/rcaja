@@ -6,10 +6,36 @@
     <title>RCA インサイト・コンパニオン</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <style>
+    <style>        
         body { font-family: 'Noto Sans JP', sans-serif; background-color: #F8FAFC; }
         .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #0EA5E9; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+           
+        #analyzeResult, #planResult {
+            width: 100%;
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
+   
+        table {
+            min-width: 600px !important; 
+            border-collapse: collapse;
+        }
+    
+
+        @media (max-width: 640px) {
+            h2 { font-size: 1.25rem !important; line-height: 1.4 !important; }
+            
+
+            .md\:p-10 { padding: 1rem !important; }
+            .p-6 { padding: 1rem !important; }
+    
+     
+            table td, table th { 
+                font-size: 0.75rem !important; 
+                padding: 8px 4px !important; 
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50">
