@@ -1,14 +1,29 @@
 <!DOCTYPE html>
 <html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCA インサイト・コンパニオン</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #F8FAFC; }
+        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #0EA5E9; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
 <body class="bg-slate-50">
-    <main class="container mx-auto px-4 pt-10 pb-16 space-y-24 max-w-screen-2xl relative z-20">
+
+    <main class="container mx-auto px-4 pt-10 pb-16 max-w-screen-2xl relative z-20">
+
         <section id="ai-lab">
-            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-3xl p-1 shadow-2xl overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
+            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-3xl p-1 shadow-2xl overflow-hidden">
                 <div class="bg-white rounded-[20px] p-6 md:p-10">
+                    
                     <div class="text-center mb-10">
                         <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">インタラクティブ・サポート</span>
                         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mt-4 mb-2 flex items-center justify-center gap-3">
-                            <span>✨</span> RCA インサイト・コンパニオン
+                            <span>✨</span> RCA インサイト・コンパニอน
                         </h2>
                         <p class="text-slate-500 max-w-2xl mx-auto">
                             深い学習、根本原因分析、そして共により安全なシステムを構築するための、あなたの心強いパートナー。
@@ -18,22 +33,18 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 
                         <div class="space-y-6">
-                            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition duration-300">
+                            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-sm">
                                 <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
                                     <span class="text-2xl">🏥</span> 1. 病院のリスクまたはインシデント・レポート
                                 </h3>
-                                <p class="text-xs text-slate-500 mb-3">インシデントの内容を記入してください。根本原因の可視化を支援します。</p>
-                                <textarea id="scenarioInput" class="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none transition shadow-inner mb-4 bg-white" rows="6" placeholder="例：看護師が類似の包装と高い業務負荷により、誤った薬剤を投与した..."></textarea>
+                                <textarea id="scenarioInput" class="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-4 bg-white" rows="6" placeholder="インシデントの内容を入力してください..."></textarea>
                                 
-                                <button id="combinedRunButton" onclick="startFullAnalysis()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg hover:shadow-green-500/30 flex justify-center items-center gap-2 transform active:scale-95">
-                                    <span id="runSpinner" class="loader hidden border-white border-t-green-800"></span>
-                                    <span>🔍 根本原因分析 (RCA) を開始</span>
+                                <button onclick="startFullAnalysis()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex justify-center items-center gap-2">
+                                    <span>🔍 RCA分析を開始</span>
                                 </button>
-
-                                <div class="mt-4 rounded-xl border border-amber-100 bg-white shadow-inner overflow-hidden">
-                                  <div id="analyzeResult" class="hidden p-4 text-sm text-slate-700 overflow-x-auto"></div>
-                                </div>
+                                <div id="analyzeResult" class="hidden mt-4 p-4 text-sm text-slate-700 bg-white rounded-xl border border-amber-100"></div>
                             </div>
+                        </div>
                         </div>
 
                         <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100 shadow-md relative overflow-hidden h-full">
