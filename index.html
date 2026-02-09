@@ -890,43 +890,249 @@
     function extractEventOutcome(rootEl) {
       if (!rootEl) return "";
 
-      // Find <h3> for "1. イベントの概要" (or Event Summary)
+      const normalize = (s) => (s || "").replace(/\s+/g, " ").trim();
+
+      // Find <h3> for "1. イベントの概要"
       const h3s = Array.from(rootEl.querySelectorAll("h3"));
       const summaryH3 = h3s.find(h => {
-        const t = (h.textContent || "").trim();
-        return (
-          /1\.\s*/.test(t) &&
-          (t.includes("イベントの概要") || t.toLowerCase().includes("event summary"))
-        );
+        const t = normalize(h.textContent);
+        return /1\.\s*/.test(t) && (t.includes("イベントの概要") || t.toLowerCase().includes("event summary"));
       });
 
       const pickNextMeaningfulText = (startNode) => {
         if (!startNode) return "";
         let n = startNode.nextElementSibling;
-
         while (n) {
-          const txt = (n.textContent || "").replace(/\s+/g, " ").trim();
-
-          // stop at next section header
           if (n.tagName === "H3") break;
-
+          const txt = normalize(n.textContent);
           if (txt.length >= 10) return txt;
           n = n.nextElementSibling;
         }
         return "";
       };
 
-      let outcome = summaryH3 ? pickNextMeaningfulText(summaryH3) : "";
+      let raw = summaryH3 ? pickNextMeaningfulText(summaryH3) : "";
+      if (!raw) raw = normalize(rootEl.textContent).slice(0, 200);
 
-      // fallback: first chunk of all text
-      if (!outcome) {
-        const all = (rootEl.textContent || "").replace(/\s+/g, " ").trim();
-        outcome = all.slice(0, 160);
-      }
+      // Prefer a short "title-like" first sentence
+      let title = raw;
+      const cutIdx = (() => {
+        const candidates = [
+          title.indexOf("。"),
+          title.indexOf("."),
+          title.indexOf("；"),
+          title.indexOf(";"),
+          title.indexOf("："),
+          title.indexOf(":"),
+          title.indexOf("\n")
+        ].filter(i => i > 0);
+        return candidates.length ? Math.min(...candidates) : -1;
+      })();
 
-      outcome = outcome.replace(/\s+/g, " ").trim();
-      if (outcome.length > 90) outcome = outcome.slice(0, 90) + "…";
-      return outcome;
+      if (cutIdx > 0 && cutIdx < 90) title = title.slice(0, cutIdx + 1);
+      title = normalize(title);
+
+      if (title.length > 90) title = title.slice(0, 90) + "…";
+      return title;
+    }
+
+    // ✅ NEW: Render "real fishbone" SVG above fishbone-grid, and show Event/Outcome on arrow head.
+    function upgradeFishbone(rootEl, outcomeText) {
+      if (!rootEl) return;
+
+      const normalize = (s) => (s || "").replace(/\s+/g, " ").trim();
+
+      const findFishboneGrid = () => {
+        const h3s = Array.from(rootEl.querySelectorAll("h3"));
+        const fbH3 = h3s.find(h => {
+          const t = normalize(h.textContent);
+          return (t.includes("フィッシュボーン") || t.toLowerCase().includes("fishbone")) && t.includes("3.");
+        });
+
+        // fallback: any fishbone mention
+        const fbH3Fallback = fbH3 || h3s.find(h => {
+          const t = normalize(h.textContent);
+          return (t.includes("フィッシュボーン") || t.toLowerCase().includes("fishbone"));
+        });
+
+        let node = fbH3Fallback ? fbH3Fallback.nextElementSibling : null;
+        while (node) {
+          if (node.classList && node.classList.contains("fishbone-grid")) return { h3: fbH3Fallback, grid: node };
+          node = node.nextElementSibling;
+        }
+
+        // fallback: just find first fishbone-grid
+        const grid = rootEl.querySelector(".fishbone-grid");
+        if (grid) return { h3: null, grid };
+        return null;
+      };
+
+      const parseCategories = (gridEl) => {
+        if (!gridEl) return [];
+        const cards = Array.from(gridEl.querySelectorAll(".fishbone-card"));
+        const source = cards.length ? cards : Array.from(gridEl.children);
+
+        const getItems = (cardEl) => {
+          const lis = Array.from(cardEl.querySelectorAll("li")).map(li => normalize(li.textContent)).filter(Boolean);
+          if (lis.length) return lis;
+
+          // fallback: paragraphs or lines
+          const ps = Array.from(cardEl.querySelectorAll("p")).map(p => normalize(p.textContent)).filter(Boolean);
+          if (ps.length) return ps;
+
+          // fallback: split remaining text
+          const txt = normalize(cardEl.textContent);
+          if (!txt) return [];
+          return txt.split(/・|\/|\n|、/g).map(s => normalize(s)).filter(s => s.length >= 4);
+        };
+
+        const cats = [];
+        for (const el of source) {
+          const headerEl = el.querySelector ? el.querySelector(".fishbone-header") : null;
+          const header = normalize(headerEl ? headerEl.textContent : "");
+          if (!header) continue;
+
+          const items = getItems(el)
+            .filter(x => x && x !== header)
+            .slice(0, 3)
+            .map(x => x.length > 20 ? x.slice(0, 20) + "…" : x);
+
+          cats.push({ label: header, items });
+        }
+        return cats.slice(0, 6);
+      };
+
+      const escapeXML = (s) =>
+        String(s ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&apos;");
+
+      const wrapByChars = (text, maxChars) => {
+        const t = String(text ?? "").trim();
+        if (!t) return [];
+        const lines = [];
+        let i = 0;
+        while (i < t.length) {
+          lines.push(t.slice(i, i + maxChars));
+          i += maxChars;
+          if (lines.length >= 2) break; // keep arrow head readable
+        }
+        if (t.length > maxChars * 2) {
+          lines[lines.length - 1] = lines[lines.length - 1].slice(0, Math.max(0, maxChars - 1)) + "…";
+        }
+        return lines;
+      };
+
+      const makeSVG = (cats, outcome) => {
+        const W = 1000, H = 520;
+        const spineY = 260;
+        const spineX1 = 90;
+        const spineX2 = 820;
+
+        const arrow = {
+          x: 830,
+          y1: spineY - 70,
+          y2: spineY + 70,
+          tipX: 980,
+          tipY: spineY
+        };
+
+        const title = outcome && outcome.trim() ? outcome.trim() : "イベント / 結果";
+        const lines = wrapByChars(title, 12).map(escapeXML);
+
+        const n = cats.length || 1;
+        const xStart = 200;
+        const xEnd = 760;
+        const step = n > 1 ? (xEnd - xStart) / (n - 1) : 0;
+
+        const bones = cats.map((c, idx) => {
+          const x = xStart + step * idx;
+          const isTop = idx % 2 === 0;
+          const endY = isTop ? 95 : 425;
+          const endX = x - 85;
+
+          const labelW = 200;
+          const labelH = 28;
+          const labelX = endX - 10;
+          const labelY = isTop ? endY - 34 : endY + 6;
+
+          const itemsY = isTop ? labelY - 10 : labelY + 46;
+          const itemsDy = isTop ? -16 : 16;
+
+          const itemLines = (c.items || []).slice(0, 3).map(escapeXML);
+
+          return `
+            <line x1="${x}" y1="${spineY}" x2="${endX}" y2="${endY}" stroke="#64748B" stroke-width="2" />
+            <rect x="${labelX}" y="${labelY}" width="${labelW}" height="${labelH}" rx="8" fill="#FFFFFF" stroke="#CBD5E1" />
+            <text x="${labelX + 12}" y="${labelY + 19}" font-family="sans-serif" font-size="14" font-weight="700" fill="#0F172A">
+              ${escapeXML(c.label)}
+            </text>
+            ${
+              itemLines.map((t, i) => {
+                const y = itemsY + (i * itemsDy);
+                return `<text x="${labelX + 12}" y="${y}" font-family="sans-serif" font-size="12" fill="#334155">${t}</text>`;
+              }).join("")
+            }
+          `;
+        }).join("");
+
+        const arrowTextY = spineY - (lines.length === 2 ? 10 : 0);
+        const arrowTspans = lines.map((t, i) =>
+          `<tspan x="910" dy="${i === 0 ? 0 : 18}">${t}</tspan>`
+        ).join("");
+
+        return `
+          <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto">
+            <!-- Spine -->
+            <line x1="${spineX1}" y1="${spineY}" x2="${spineX2}" y2="${spineY}" stroke="#334155" stroke-width="5" />
+            <!-- Arrow head -->
+            <polygon points="${arrow.x},${arrow.y1} ${arrow.tipX},${arrow.tipY} ${arrow.x},${arrow.y2}" fill="#0EA5E9" />
+            <text x="910" y="${arrowTextY}" font-family="sans-serif" font-size="16" font-weight="800" fill="#FFFFFF" text-anchor="middle">
+              ${arrowTspans}
+            </text>
+            <text x="910" y="${spineY + 48}" font-family="sans-serif" font-size="12" fill="#E0F2FE" text-anchor="middle">
+              (Event / Outcome)
+            </text>
+
+            <!-- Bones -->
+            ${bones}
+
+            <!-- Root note -->
+            <text x="${spineX1}" y="${spineY - 18}" font-family="sans-serif" font-size="12" fill="#64748B">
+              Contributing factors (Ishikawa / Fishbone)
+            </text>
+          </svg>
+        `;
+      };
+
+      const found = findFishboneGrid();
+      if (!found || !found.grid) return;
+
+      const categories = parseCategories(found.grid);
+      if (!categories.length) return;
+
+      const vizId = "fishbone-viz";
+      const existing = rootEl.querySelector("#" + vizId);
+      if (existing) existing.remove();
+
+      const wrapper = document.createElement("div");
+      wrapper.id = vizId;
+      wrapper.className = "w-full overflow-hidden bg-slate-50 rounded-xl border border-slate-200 p-3 mb-4";
+      wrapper.innerHTML = `
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-base">🐟</span>
+          <div class="text-xs font-bold text-slate-600 uppercase tracking-wide">Fishbone Diagram (Ishikawa)</div>
+        </div>
+        ${makeSVG(categories, outcomeText)}
+        <div class="text-[11px] text-slate-500 mt-1">
+          ※ 詳細は下のカード一覧（fishbone-grid）に保持しています。
+        </div>
+      `;
+
+      found.grid.parentNode.insertBefore(wrapper, found.grid);
     }
   
     async function startFullAnalysis() {
@@ -964,7 +1170,13 @@
   <h3 class="font-bold text-lg text-teal-700 mb-2">1. イベントの概要</h3>
   <h3 class="font-bold text-lg text-teal-700 mb-2">2. イベントのタイムライン</h3>
   <h3 class="font-bold text-lg text-amber-700 mb-2">3. フィッシュボーン図（石川図）</h3>
-  <div class="fishbone-grid">...</div>
+  <div class="fishbone-grid">
+    <!-- 各カテゴリは必ずこの形で -->
+    <div class="fishbone-card">
+      <div class="fishbone-header">カテゴリ名 (例: 人/機械/方法/材料/環境/測定)</div>
+      <ul><li>要因...</li></ul>
+    </div>
+  </div>
   <h3 class="font-bold text-lg text-pink-600 mb-2">4. なぜなぜ分析 (5 Whys)</h3>
   <h3 class="font-bold text-lg text-green-700 mb-2">5. スイスチーズ・モデル分析</h3>
   <table class="rca-table w-full">
@@ -979,11 +1191,9 @@
         resultDiv.innerHTML = htmlContent;
         resultDiv.classList.remove('hidden');
 
-        // ✅ NEW: Use extracted Event/Outcome from analysis (not input)
+        // ✅ NEW: Arrow head uses Event/Outcome extracted from analysis (not input)
         const outcomeText = extractEventOutcome(resultDiv);
-        if (typeof upgradeFishbone === "function") {
-          upgradeFishbone(resultDiv, outcomeText);
-        }
+        upgradeFishbone(resultDiv, outcomeText);
   
         const cleanText = stripHtml(htmlContent);
         planInput.value = 'アクションプラン生成中...';
