@@ -11,6 +11,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 
   <style>
+    /* ทำให้ตาราง PDSA ไม่กินครึ่งจอ */
+    .pdsatable { width: 100%; table-layout: auto; }
+    .pdsatable th, .pdsatable td { vertical-align: top; }
+    .pdsatable th:first-child,
+    .pdsatable td:first-child{
+      width: 110px;          /* ปรับเป็น 90-140 ได้ตามชอบ */
+      white-space: nowrap;   /* ไม่ให้คำว่า Plan/Do แตกบรรทัด */
+    }
+    .pdsatable td:nth-child(2){ width: auto; }
     body { font-family: 'Noto Sans JP', sans-serif; background-color: #F8FAFC; }
     .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #0EA5E9; width: 20px; height: 20px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
