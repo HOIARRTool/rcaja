@@ -885,6 +885,49 @@
       tmp.innerHTML = html;
       return (tmp.textContent || tmp.innerText || "").trim();
     }
+
+    // ✅ NEW: Extract Event/Outcome from Step1 analysis HTML (not from input)
+    function extractEventOutcome(rootEl) {
+      if (!rootEl) return "";
+
+      // Find <h3> for "1. イベントの概要" (or Event Summary)
+      const h3s = Array.from(rootEl.querySelectorAll("h3"));
+      const summaryH3 = h3s.find(h => {
+        const t = (h.textContent || "").trim();
+        return (
+          /1\.\s*/.test(t) &&
+          (t.includes("イベントの概要") || t.toLowerCase().includes("event summary"))
+        );
+      });
+
+      const pickNextMeaningfulText = (startNode) => {
+        if (!startNode) return "";
+        let n = startNode.nextElementSibling;
+
+        while (n) {
+          const txt = (n.textContent || "").replace(/\s+/g, " ").trim();
+
+          // stop at next section header
+          if (n.tagName === "H3") break;
+
+          if (txt.length >= 10) return txt;
+          n = n.nextElementSibling;
+        }
+        return "";
+      };
+
+      let outcome = summaryH3 ? pickNextMeaningfulText(summaryH3) : "";
+
+      // fallback: first chunk of all text
+      if (!outcome) {
+        const all = (rootEl.textContent || "").replace(/\s+/g, " ").trim();
+        outcome = all.slice(0, 160);
+      }
+
+      outcome = outcome.replace(/\s+/g, " ").trim();
+      if (outcome.length > 90) outcome = outcome.slice(0, 90) + "…";
+      return outcome;
+    }
   
     async function startFullAnalysis() {
       const input = document.getElementById('scenarioInput').value;
@@ -935,6 +978,12 @@
   
         resultDiv.innerHTML = htmlContent;
         resultDiv.classList.remove('hidden');
+
+        // ✅ NEW: Use extracted Event/Outcome from analysis (not input)
+        const outcomeText = extractEventOutcome(resultDiv);
+        if (typeof upgradeFishbone === "function") {
+          upgradeFishbone(resultDiv, outcomeText);
+        }
   
         const cleanText = stripHtml(htmlContent);
         planInput.value = 'アクションプラン生成中...';
