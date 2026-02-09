@@ -146,7 +146,6 @@
                 <div id="analyzeResult" class="hidden mt-4 p-4 text-sm text-slate-700 bg-white rounded-xl border border-amber-100 w-full"></div>
               </div>
             </div>
-
             <!-- Step 2 -->
             <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100 shadow-md relative overflow-hidden h-full w-full">
               <div class="absolute top-0 right-0 bg-blue-200 text-blue-800 text-[10px] font-bold px-2 py-1 rounded-bl-lg">ステップ 2 (自動)</div>
@@ -1314,7 +1313,17 @@
   "${cleanText}"
   
   (1) <h3>1. PDSA</h3>
-    - Plan / Do / Study / Act を見出し付きで具体化
+    - 必ず「表」で出力してください（PDSAは箇条書き禁止）
+    - 形式は以下のHTMLテーブルを厳守（thead+tbody必須）
+      <table class="pdsatable w-full">
+        <thead><tr><th>段階</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td>Plan</td><td><ul><li>...</li></ul></td></tr>
+          <tr><td>Do</td><td><ul><li>...</li></ul></td></tr>
+          <tr><td>Study</td><td><ul><li>...</li></ul></td></tr>
+          <tr><td>Act</td><td><ul><li>...</li></ul></td></tr>
+        </tbody>
+      </table>
   
   (2) <h3>2. Action Plan</h3>
     - 表形式（列は最大5列）
