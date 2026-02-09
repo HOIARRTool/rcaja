@@ -851,46 +851,41 @@
   </div>
 
   <script>
-    // --- Core Gemini API Call Function (PROXY VERSION) ---
     async function callGemini(prompt) {
-      try {
-        const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: prompt })
-        });
-
-        if (!response.ok) {
-          let errData = {};
-          try { errData = await response.json(); } catch (_) {}
-          throw new Error(`Server Error: ${errData.error?.message || response.statusText}`);
-        }
-
-        const data = await response.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-      } catch (error) {
-        console.error(error);
-        throw error;
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+  
+      if (!response.ok) {
+        let errData = {};
+        try { errData = await response.json(); } catch (_) {}
+        throw new Error(`Server Error: ${errData?.error?.message || response.statusText}`);
       }
+  
+      const data = await response.json();
+  
+      // ✅ รองรับหลายรูปแบบ payload กันพัง
+      if (typeof data?.text === 'string') return data.text;
+      return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     }
-
-    // ✅ sanitize: เอา code fence + script ออกกันหลุด
+  
     function sanitizeLLMHtml(text) {
       const raw = String(text ?? "")
         .replace(/```(?:html)?/gi, "")
         .replace(/```/g, "")
         .trim();
-
-      // remove script tags for safety
+  
       return raw.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
     }
-
+  
     function stripHtml(html) {
       const tmp = document.createElement("div");
       tmp.innerHTML = html;
       return (tmp.textContent || tmp.innerText || "").trim();
     }
-
+  
     async function startFullAnalysis() {
       const input = document.getElementById('scenarioInput').value;
       const runButton = document.getElementById('combinedRunButton');
@@ -898,82 +893,82 @@
       const resultDiv = document.getElementById('analyzeResult');
       const planInput = document.getElementById('planInput');
       const planResultDiv = document.getElementById('planResult');
-
+  
       if (!input.trim()) { alert("内容を入力してください"); return; }
-
+  
       runButton.disabled = true;
       spinner.classList.remove('hidden');
       resultDiv.classList.add('hidden');
       planResultDiv.classList.add('hidden');
       planInput.value = '分析中...';
-
+  
       try {
-        // Step 1: ✅ Swiss cheese บังคับแน่ ๆ
+        // ✅ Step 1: ต้องมี Swiss cheese แน่ ๆ
         const promptAnalysis = `
-あなたは医療安全の専門家（RCA担当）です。
-以下の医療シナリオを日本語で分析してください: "${input}"
-
-【重要】
-- 出力はHTMLのみ。Markdownの\`\`\`は禁止。
-- 必ず以下の5セクションをこの順で含める:
-  1) イベントの概要
-  2) イベントのタイムライン
-  3) フィッシュボーン図（<div class="fishbone-grid"> を使う）
-  4) なぜなぜ分析 (5 Whys)
-  5) スイスチーズ・モデル分析（表: システム層 / タイプ / 穴(弱点) / 防御策）
-
-【必須フォーマット（見出しはこの文言で）】
-<h3 class="font-bold text-lg text-teal-700 mb-2">1. イベントの概要</h3>
-<h3 class="font-bold text-lg text-teal-700 mb-2">2. イベントのタイムライン</h3>
-<h3 class="font-bold text-lg text-amber-700 mb-2">3. フィッシュボーン図（石川図）</h3>
-<div class="fishbone-grid">...</div>
-<h3 class="font-bold text-lg text-pink-600 mb-2">4. なぜなぜ分析 (5 Whys)</h3>
-<h3 class="font-bold text-lg text-green-700 mb-2">5. スイスチーズ・モデル分析</h3>
-<table class="rca-table w-full">
-  <thead><tr><th>システム層</th><th>タイプ</th><th>穴（弱点）</th><th>防御策（提案）</th></tr></thead>
-  <tbody>...</tbody>
-</table>
+  あなたは医療安全の専門家（RCA担当）です。
+  以下の医療シナリオを日本語で分析してください: "${input}"
+  
+  【重要】
+  - 出力はHTMLのみ。Markdownの\`\`\`は禁止。
+  - 必ず以下の5セクションをこの順で含める:
+    1) イベントの概要
+    2) イベントのタイムライン
+    3) フィッシュボーン図（<div class="fishbone-grid"> を使う）
+    4) なぜなぜ分析 (5 Whys)
+    5) スイスチーズ・モデル分析（表: システム層 / タイプ / 穴(弱点) / 防御策）
+  
+  【必須フォーマット（見出しはこの文言で）】
+  <h3 class="font-bold text-lg text-teal-700 mb-2">1. イベントの概要</h3>
+  <h3 class="font-bold text-lg text-teal-700 mb-2">2. イベントのタイムライン</h3>
+  <h3 class="font-bold text-lg text-amber-700 mb-2">3. フィッシュボーン図（石川図）</h3>
+  <div class="fishbone-grid">...</div>
+  <h3 class="font-bold text-lg text-pink-600 mb-2">4. なぜなぜ分析 (5 Whys)</h3>
+  <h3 class="font-bold text-lg text-green-700 mb-2">5. スイスチーズ・モデル分析</h3>
+  <table class="rca-table w-full">
+    <thead><tr><th>システム層</th><th>タイプ</th><th>穴（弱点）</th><th>防御策（提案）</th></tr></thead>
+    <tbody>...</tbody>
+  </table>
         `.trim();
-
+  
         const resText = await callGemini(promptAnalysis);
         const htmlContent = sanitizeLLMHtml(resText);
-
+  
         resultDiv.innerHTML = htmlContent;
         resultDiv.classList.remove('hidden');
-
+  
         const cleanText = stripHtml(htmlContent);
         planInput.value = 'アクションプラン生成中...';
-
-        // Step 2: ✅ 4 ส่วนบังคับแน่ ๆ
+  
+        // ✅ Step 2: ต้องมี 4 ส่วนแน่ ๆ
         const promptPlan = `
-あなたは病院の安全管理者です。
-以下の分析データに基づき、日本語HTMLのみで、必ず次の4部構成で出力してください（順番厳守）。Markdown禁止。
-
-分析データ:
-"${cleanText}"
-
-(1) <h3>1. PDSA</h3>
-  - Plan / Do / Study / Act を見出し付きで具体化
-
-(2) <h3>2. Action Plan</h3>
-  - 表形式（列は最大5列）
-  - 施策 / 担当 / 期限 / KPI(成果指標) / リスクと対策
-
-(3) <h3>3. Initiative Ideas</h3>
-  - Quick Wins(0-30日), Mid-term(1-3ヶ月), Long-term(3-12ヶ月)
-
-(4) <h3>4. Conclusion & Recommendations</h3>
-  - 重要度順に5項目
-  - 最後に「次の一手（72時間以内）」を必ず入れる
+  あなたは病院の安全管理者です。
+  以下の分析データに基づき、日本語HTMLのみで、必ず次の4部構成で出力してください（順番厳守）。Markdown禁止。
+  
+  分析データ:
+  "${cleanText}"
+  
+  (1) <h3>1. PDSA</h3>
+    - Plan / Do / Study / Act を見出し付きで具体化
+  
+  (2) <h3>2. Action Plan</h3>
+    - 表形式（列は最大5列）
+    - 施策 / 担当 / 期限 / KPI(成果指標) / リスクと対策
+  
+  (3) <h3>3. Initiative Ideas</h3>
+    - Quick Wins(0-30日), Mid-term(1-3ヶ月), Long-term(3-12ヶ月)
+  
+  (4) <h3>4. Conclusion & Recommendations</h3>
+    - 重要度順に5項目
+    - 最後に「次の一手（72時間以内）」を必ず入れる
         `.trim();
-
+  
         const resPlan = await callGemini(promptPlan);
         const planHtml = sanitizeLLMHtml(resPlan);
-
+  
         planResultDiv.innerHTML = planHtml;
         planResultDiv.classList.remove('hidden');
         planInput.value = '✔ 完了しました';
-
+  
       } catch (error) {
         console.error(error);
         alert("エラー: " + error.message);
@@ -983,77 +978,14 @@
         runButton.disabled = false;
       }
     }
-
-    // (คงไว้) ฟังก์ชันเดิม – ไม่ตัดอะไรทิ้ง
-    async function analyzeRiskStep(input) {
-      const prompt = `あなたは医療安全の専門家（RCA担当）として振る舞ってください。
-以下の医療シナリオを日本語で分析してください: "${input}"。
-
-HTML形式で日本語で出力してください。Markdownコードブロックは使用しないでください。
-以下の構造に従ってください:
-
-<h3 class="font-bold text-lg text-teal-700 mb-2">1. イベントの概要</h3>
-<p class="mb-2 text-slate-600">...イベントの記述的要約...</p>
-<ul class="list-disc pl-5 mb-4 text-slate-600 space-y-1">
-  <li>...重要ポイント 1...</li>
-</ul>
-
-<h3 class="font-bold text-lg text-teal-700 mb-2">2. イベントのタイムライン</h3>
-<ol class="list-decimal pl-5 mb-4 text-slate-600 space-y-1">
-  <li>...詳細なステップ 1...</li>
-</ol>
-
-<h3 class="font-bold text-lg text-amber-700 mb-2">3. フィッシュボーン図（石川図）</h3>
-<div class="fishbone-grid">
-  <div class="fishbone-card"><div class="fishbone-header">👤 人 (Man)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
-  <div class="fishbone-card"><div class="fishbone-header">⚙️ 機械 (Machine)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
-  <div class="fishbone-card"><div class="fishbone-header">📝 方法 (Method)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
-  <div class="fishbone-card"><div class="fishbone-header">📦 材料 (Material)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
-  <div class="fishbone-card"><div class="fishbone-header">🌡️ 環境 (Environment)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
-  <div class="fishbone-card"><div class="fishbone-header">📏 測定 (Measurement)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
-</div>
-
-<h3 class="font-bold text-lg text-pink-600 mb-2">4. なぜなぜ分析 (5 Whys)</h3>
-<div class="bg-pink-50 p-4 rounded-lg border border-pink-100 mb-4">
-  <div class="why-step"><div class="why-number">1</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ...</div></div>
-  <div class="why-step"><div class="why-number">5</div><div class="text-sm text-slate-700 pt-1 font-bold text-pink-700">根本原因: ...</div></div>
-</div>
-
-<h3 class="font-bold text-lg text-green-700 mb-2">5. スイスチーズ・モデル分析</h3>
-<table class="rca-table w-full">
-  <thead><tr><th>システム層</th><th>タイプ</th><th>穴（弱点）</th><th>防御策</th></tr></thead>
-  <tbody>
-    <tr><td><strong>組織的な影響</strong></td><td>潜在的</td><td>...</td><td>...</td></tr>
-    <tr><td><strong>不安全な行為</strong></td><td>顕在的</td><td>...</td><td>...</td></tr>
-  </tbody>
-</table>`;
-
-      const responseText = await callGemini(prompt);
-      const formattedText = sanitizeLLMHtml(responseText);
-      const cleanText = stripHtml(formattedText);
-      return { html: formattedText, cleanText: cleanText };
-    }
-
-    async function generateActionPlanStep(analysisData) {
-      const prompt = `あなたは病院の安全管理者です。
-分析データ: "${analysisData}" に基づき、日本語のHTMLで、PDSA、Action Plan、Initiative Ideas、Conclusion & Recommendations を含むレスポンスを作成してください。`;
-
-      try {
-        const responseText = await callGemini(prompt);
-        return sanitizeLLMHtml(responseText);
-      } catch (error) {
-        console.error("Action Plan Error:", error);
-        throw new Error(`アクションプランの生成に失敗しました: ${error.message}`);
-      }
-    }
-
+  
     function exportToWord() {
       const scenario = document.getElementById('scenarioInput').value;
       const riskAnalysis = document.getElementById('analyzeResult').innerHTML;
       const actionPlan = document.getElementById('planResult').innerHTML;
-
+  
       if (!actionPlan) { alert("分析を先に完了させてください。"); return; }
-
+  
       const content = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head><meta charset='utf-8'><title>医療安全アクションプラン</title></head>
@@ -1067,6 +999,7 @@ HTML形式で日本語で出力してください。Markdownコードブロッ�
         </body>
         </html>
       `;
+  
       const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -1074,35 +1007,36 @@ HTML形式で日本語で出力してください。Markdownコードブロッ�
       link.download = `Safety_Plan_${new Date().toISOString().slice(0,10)}.doc`;
       link.click();
     }
-
-    // Chart.js
-    Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
-    const ctx = document.getElementById('assessmentChart');
-    const assessmentChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['チームワーク', '人員配置', '組織的学習', 'エラーへの対応', '上司のサポート', '伝達', '開放性', '報告', '経営層サポート', '申し送り'],
-        datasets: [
-          { label: '自院の現状 (%)', data: [0,0,0,0,0,0,0,0,0,0], backgroundColor: '#0D9488', borderRadius: 4 },
-          { label: '目標 (100%)', data: [100,100,100,100,100,100,100,100,100,100], backgroundColor: '#E2E8F0', borderRadius: 4 }
-        ]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: { suggestedMin: 0, max: 100 },
-          y: { grid: { display: false } }
+  
+    // Chart.js (ถ้าหน้านี้มี chart อยู่)
+    if (window.Chart && document.getElementById('assessmentChart')) {
+      Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
+      const ctx = document.getElementById('assessmentChart');
+      const assessmentChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['チームワーク', '人員配置', '組織的学習', 'エラーへの対応', '上司のサポート', '伝達', '開放性', '報告', '経営層サポート', '申し送り'],
+          datasets: [
+            { label: '自院の現状 (%)', data: [0,0,0,0,0,0,0,0,0,0], backgroundColor: '#0D9488', borderRadius: 4 },
+            { label: '目標 (100%)', data: [100,100,100,100,100,100,100,100,100,100], backgroundColor: '#E2E8F0', borderRadius: 4 }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { x: { suggestedMin: 0, max: 100 }, y: { grid: { display: false } } }
         }
+      });
+  
+      window.updateChartData = function(index, value) {
+        const el = document.getElementById(`val-${index}`);
+        if (el) el.innerText = parseFloat(value).toFixed(2) + '%';
+        assessmentChart.data.datasets[0].data[index] = value;
+        assessmentChart.update();
       }
-    });
-
-    function updateChartData(index, value) {
-      document.getElementById(`val-${index}`).innerText = parseFloat(value).toFixed(2) + '%';
-      assessmentChart.data.datasets[0].data[index] = value;
-      assessmentChart.update();
     }
   </script>
+
 </body>
 </html>
