@@ -12,21 +12,14 @@
 
   <style>
     body { font-family: 'Noto Sans JP', sans-serif; background-color: #F8FAFC; }
+    .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #0EA5E9; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    .loader {
-      border: 3px solid #f3f3f3;
-      border-radius: 50%;
-      border-top: 3px solid #0EA5E9;
-      width: 20px;
-      height: 20px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    /* Chart container height (Chart.js maintainAspectRatio:false ต้องมีความสูง) */
+    .chart-container { position: relative; width: 100%; height: 360px; }
+    @media (max-width: 640px) { .chart-container { height: 320px; } }
 
-    /* --- ✅ Results container: desktop = no horizontal scroll, mobile = scroll if needed --- */
+    /* Results container: Desktop ไม่ให้ตารางดันล้น / Mobile ยังเลื่อนได้ */
     #analyzeResult, #planResult {
       width: 100%;
       max-width: 100%;
@@ -37,12 +30,12 @@
       #analyzeResult, #planResult { overflow-x: auto; }
     }
 
-    /* --- ✅ Fix table overflow: remove min-width and force wrapping --- */
+    /* ✅ สำคัญ: ตารางเต็มความกว้างและหักบรรทัดบน Desktop */
     table {
       width: 100% !important;
       max-width: 100% !important;
       border-collapse: collapse;
-      table-layout: fixed; /* IMPORTANT: prevents table from expanding wider than container */
+      table-layout: fixed;
     }
     th, td {
       vertical-align: top;
@@ -51,26 +44,7 @@
       white-space: normal;
     }
 
-    /* --- Optional: Improve readability for generated tables --- */
-    .rca-table, .pdsatable {
-      width: 100% !important;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .rca-table th, .rca-table td,
-    .pdsatable th, .pdsatable td {
-      border-bottom: 1px solid #E2E8F0;
-      padding: 10px;
-      font-size: 0.875rem;
-    }
-    .rca-table thead th, .pdsatable thead th {
-      background: #F1F5F9;
-      font-weight: 700;
-      color: #334155;
-    }
-
-    /* --- Fishbone grid styles (because LLM output uses fishbone-grid) --- */
+    /* Fishbone output รองรับแน่ ๆ */
     .fishbone-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -81,7 +55,7 @@
       .fishbone-grid { grid-template-columns: 1fr 1fr; }
     }
     .fishbone-card {
-      background: #FFFFFF;
+      background: #fff;
       border: 1px solid #E2E8F0;
       border-radius: 12px;
       padding: 12px;
@@ -94,21 +68,26 @@
       font-size: 0.95rem;
     }
 
-    /* --- 5 Whys visual --- */
-    .why-step { display: flex; align-items: flex-start; gap: 10px; margin: 6px 0; }
+    /* Why steps (UI สวยขึ้น + คงรูป) */
+    .why-step { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; }
     .why-number {
-      width: 26px; height: 26px;
-      border-radius: 9999px;
-      background: #FBCFE8;
-      color: #9D174D;
+      width: 24px; height: 24px; border-radius: 9999px;
+      background: #fff; border: 2px solid #F472B6;
+      color: #BE185D; font-weight: 800; font-size: 12px;
       display: flex; align-items: center; justify-content: center;
-      font-weight: 800;
       flex: 0 0 auto;
-      margin-top: 2px;
     }
-    .why-line { width: 10px; border-left: 2px solid #FDA4AF; margin-top: 6px; }
+    .why-line { width: 2px; background: #F9A8D4; margin-top: 24px; margin-left: 11px; height: 18px; flex: 0 0 auto; }
 
-    /* --- Mobile typography adjustments --- */
+    /* Timeline line (roadmap) */
+    .timeline-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #CBD5E1;
+    }
+
     @media (max-width: 640px) {
       h2 { font-size: 1.25rem !important; line-height: 1.4 !important; }
       .md\:p-10 { padding: 1rem !important; }
@@ -123,7 +102,6 @@
 
 <body class="bg-slate-50">
 
-  <!-- ✅ Full width layout (desktop also full width) -->
   <main class="w-full px-4 2xl:px-12 pt-10 pb-16 relative z-20">
 
     <section id="ai-lab">
@@ -140,54 +118,66 @@
             </p>
           </div>
 
-          <!-- ✅ Single column FULL width (Step1 then Step2) -->
+          <!-- ✅ Desktop: คอลัมน์เดียวเต็มหน้าจอ -->
           <div class="flex flex-col gap-8 w-full">
-          
+
             <!-- Step 1 -->
-            <div class="space-y-6">
-              <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <div class="space-y-6 w-full">
+              <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-sm w-full">
                 <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
                   <span class="text-2xl">🏥</span> 1. 病院のリスクまたはインシデント・レポート
                 </h3>
-          
-                <textarea id="scenarioInput" class="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-4 bg-white" rows="6" placeholder="インシデントの内容を入力してください..."></textarea>
-          
-                <button id="combinedRunButton" onclick="startFullAnalysis()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex justify-center items-center gap-2 transform active:scale-95">
+
+                <textarea id="scenarioInput"
+                  class="w-full p-4 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none mb-4 bg-white"
+                  rows="6"
+                  placeholder="インシデントの内容を入力してください..."></textarea>
+
+                <button id="combinedRunButton"
+                  onclick="startFullAnalysis()"
+                  class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex justify-center items-center gap-2 transform active:scale-95">
                   <span id="runSpinner" class="loader hidden border-white border-t-transparent"></span>
                   <span>🔍 RCA分析を開始</span>
                 </button>
-          
-                <div id="analyzeResult" class="hidden mt-4 p-4 text-sm text-slate-700 bg-white rounded-xl border border-amber-100"></div>
+
+                <div id="analyzeResult" class="hidden mt-4 p-4 text-sm text-slate-700 bg-white rounded-xl border border-amber-100 w-full"></div>
               </div>
             </div>
-          
+
             <!-- Step 2 -->
-            <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100 shadow-md relative overflow-hidden h-full">
+            <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100 shadow-md relative overflow-hidden h-full w-full">
               <div class="absolute top-0 right-0 bg-blue-200 text-blue-800 text-[10px] font-bold px-2 py-1 rounded-bl-lg">ステップ 2 (自動)</div>
-          
               <h3 class="text-lg font-bold text-blue-900 mb-3 flex items-center gap-2">
                 <span class="text-2xl">🎯</span> 2. リスク分析とアクションプラン
               </h3>
-          
               <p class="text-xs text-blue-700 mb-4">
-                システムが PDSA、Action Plan、Initiative Ideas、Conclusion & Recommendations の4部構成で生成します。
+                システムが <strong>PDSA / Action Plan / Initiative Ideas / Conclusion & Recommendations</strong> の4部構成で生成します。
               </p>
-          
+
               <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">入力データ:</label>
-              <textarea id="planInput" class="w-full p-4 border border-blue-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none h-24 bg-white mb-4 shadow-inner font-mono text-slate-600" placeholder="分析結果を待機中..."></textarea>
-          
+              <textarea id="planInput"
+                class="w-full p-4 border border-blue-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none h-24 bg-white mb-4 shadow-inner font-mono text-slate-600"
+                placeholder="分析結果を待機中..."></textarea>
+
               <div class="flex gap-2">
-                <button onclick="exportToWord()" class="w-full bg-white hover:bg-slate-50 text-blue-700 border border-blue-200 font-bold py-3 px-4 rounded-xl transition shadow-md flex justify-center items-center gap-2 transform active:scale-95" title="Word形式で書き出す">
+                <button onclick="exportToWord()"
+                  class="w-full bg-white hover:bg-slate-50 text-blue-700 border border-blue-200 font-bold py-3 px-4 rounded-xl transition shadow-md flex justify-center items-center gap-2 transform active:scale-95"
+                  title="Word形式で書き出す">
                   <span class="text-lg">📄</span>
                   <span class="md:inline">Wordで書き出す</span>
                 </button>
               </div>
-          
-              <div class="mt-6 rounded-xl border border-blue-100 bg-white shadow-lg overflow-hidden">
-                <div id="planResult" class="hidden p-5 text-sm text-slate-700 min-h-[100px]"></div>
+
+              <div class="mt-6 rounded-xl border border-blue-100 bg-white shadow-lg overflow-hidden w-full">
+                <div id="planResult" class="hidden p-5 text-sm text-slate-700 min-h-[100px] w-full"></div>
               </div>
-            </div>          
-          </div
+            </div>
+
+          </div>
+          <!-- /Step panels -->
+
+        </div>
+      </div>
 
       <div class="mt-20 flex items-center justify-center">
         <div class="h-px w-24 bg-slate-300"></div>
@@ -196,7 +186,6 @@
       </div>
     </section>
 
-    <!-- ======= Deep knowledge sections (unchanged content) ======= -->
     <section>
       <div class="text-center mb-12">
         <h2 class="text-3xl font-bold text-slate-800">1. 核となるコンセプトの詳細</h2>
@@ -223,18 +212,23 @@
               <polygon points="650,130 790,175 650,220" fill="#0EA5E9" />
               <text x="705" y="172" font-family="sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">問題</text>
               <text x="705" y="195" font-family="sans-serif" font-size="12" fill="#E0F2FE" text-anchor="middle">(結果)</text>
+
               <line x1="150" y1="50" x2="200" y2="175" stroke="#64748B" stroke-width="2" />
               <rect x="100" y="20" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
               <text x="150" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">人 (Man)</text>
+
               <line x1="350" y1="50" x2="400" y2="175" stroke="#64748B" stroke-width="2" />
               <rect x="300" y="20" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
               <text x="350" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">機械 (Machine)</text>
+
               <line x1="550" y1="50" x2="600" y2="175" stroke="#64748B" stroke-width="2" />
               <rect x="500" y="20" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
               <text x="550" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">方法 (Method)</text>
+
               <line x1="150" y1="300" x2="200" y2="175" stroke="#64748B" stroke-width="2" />
               <rect x="100" y="300" width="100" height="30" rx="5" fill="white" stroke="#64748B" />
               <text x="150" y="320" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">材料 (Material)</text>
+
               <line x1="450" y1="300" x2="500" y2="175" stroke="#64748B" stroke-width="2" />
               <rect x="400" y="300" width="120" height="30" rx="5" fill="white" stroke="#64748B" />
               <text x="460" y="320" font-family="sans-serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">環境 (Environment)</text>
@@ -242,12 +236,30 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600 bg-cyan-50 p-4 rounded-xl border border-cyan-100">
-            <div><strong class="text-cyan-800">1. 人 (Man):</strong><p>職員の能力、疲労、ストレス、配置レベル、トレーニング。</p></div>
-            <div><strong class="text-cyan-800">2. 機械 (Machine):</strong><p>故障、校正の問題、メンテナンス不足、使いやすさの設計。</p></div>
-            <div><strong class="text-cyan-800">3. 方法 (Method):</strong><p>不明確なSOP、古いガイドライン、不十分なコミュニケーション・プロトコル。</p></div>
-            <div><strong class="text-cyan-800">4. 材料 (Material):</strong><p>欠陥のある薬剤、類似したパッケージ、低品質の消耗品。</p></div>
-            <div><strong class="text-cyan-800">5. 環境 (Environment):</strong><p>騒音、照明、レイアウト、注意散漫、温度。</p></div>
-            <div><strong class="text-cyan-800">6. 測定 (Measurement):</strong><p>データの正確性、検査結果の解釈、指標の妥当性。</p></div>
+            <div>
+              <strong class="text-cyan-800">1. 人 (Man):</strong>
+              <p>職員の能力、疲労、ストレス、配置レベル、トレーニング。</p>
+            </div>
+            <div>
+              <strong class="text-cyan-800">2. 機械 (Machine):</strong>
+              <p>故障、校正の問題、メンテナンス不足、使いやすさの設計。</p>
+            </div>
+            <div>
+              <strong class="text-cyan-800">3. 方法 (Method):</strong>
+              <p>不明確なSOP、古いガイドライン、不十分なコミュニケーション・プロトコル。</p>
+            </div>
+            <div>
+              <strong class="text-cyan-800">4. 材料 (Material):</strong>
+              <p>欠陥のある薬剤、類似したパッケージ、低品質の消耗品。</p>
+            </div>
+            <div>
+              <strong class="text-cyan-800">5. 環境 (Environment):</strong>
+              <p>騒音、照明、レイアウト、注意散漫、温度。</p>
+            </div>
+            <div>
+              <strong class="text-cyan-800">6. 測定 (Measurement):</strong>
+              <p>データの正確性、検査結果の解釈、指標の妥当性。</p>
+            </div>
           </div>
         </div>
 
@@ -262,11 +274,26 @@
           <div class="bg-pink-50 p-4 rounded-lg border border-pink-100">
             <strong class="text-pink-800 block mb-2 text-sm">例：患者が転倒した。</strong>
             <div class="space-y-0">
-              <div class="why-step"><div class="why-number">1</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ？ 床が濡れていた。</div></div>
-              <div class="why-step"><div class="why-number">2</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ？ パイプから水が漏れていた。</div></div>
-              <div class="why-step"><div class="why-number">3</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ？ シール材が破損した。</div></div>
-              <div class="why-step"><div class="why-number">4</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ？ 安価なシール材を購入した。</div></div>
-              <div class="why-step"><div class="why-number">5</div><div class="text-sm text-slate-700 pt-1 font-bold text-pink-700">根本原因：調達方針が品質ではなく最低価格を優先している。</div></div>
+              <div class="why-step">
+                <div class="why-number">1</div><div class="why-line"></div>
+                <div class="text-sm text-slate-700 pt-1">なぜ？ 床が濡れていた。</div>
+              </div>
+              <div class="why-step">
+                <div class="why-number">2</div><div class="why-line"></div>
+                <div class="text-sm text-slate-700 pt-1">なぜ？ パイプから水が漏れていた。</div>
+              </div>
+              <div class="why-step">
+                <div class="why-number">3</div><div class="why-line"></div>
+                <div class="text-sm text-slate-700 pt-1">なぜ？ シール材が破損した。</div>
+              </div>
+              <div class="why-step">
+                <div class="why-number">4</div><div class="why-line"></div>
+                <div class="text-sm text-slate-700 pt-1">なぜ？ 安価なシール材を購入した。</div>
+              </div>
+              <div class="why-step">
+                <div class="why-number">5</div>
+                <div class="text-sm text-slate-700 pt-1 font-bold text-pink-700">根本原因：調達方針が品質ではなく最低価格を優先している。</div>
+              </div>
             </div>
           </div>
         </div>
@@ -326,6 +353,7 @@
               </defs>
               <line x1="50" y1="140" x2="720" y2="140" stroke="#EF4444" stroke-width="4" stroke-dasharray="10,5" marker-end="url(#arrowRed)" />
               <text x="50" y="120" font-family="sans-serif" font-size="14" font-weight="bold" fill="#EF4444">ハザード</text>
+
               <g transform="translate(150, 40)">
                 <rect x="0" y="0" width="70" height="200" rx="4" fill="#FEF3C7" stroke="#334155" stroke-width="2" />
                 <circle cx="35" cy="40" r="10" fill="white" stroke="#334155" stroke-width="1" />
@@ -333,6 +361,7 @@
                 <circle cx="35" cy="100" r="15" fill="white" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,2" />
                 <text x="35" y="230" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">組織の方針</text>
               </g>
+
               <g transform="translate(300, 40)">
                 <rect x="0" y="0" width="70" height="200" rx="4" fill="#FDE68A" stroke="#334155" stroke-width="2" />
                 <circle cx="20" cy="50" r="9" fill="white" stroke="#334155" stroke-width="1" />
@@ -340,6 +369,7 @@
                 <circle cx="35" cy="100" r="15" fill="white" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,2" />
                 <text x="35" y="230" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">管理・監督</text>
               </g>
+
               <g transform="translate(450, 40)">
                 <rect x="0" y="0" width="70" height="200" rx="4" fill="#FCD34D" stroke="#334155" stroke-width="2" />
                 <circle cx="45" cy="30" r="8" fill="white" stroke="#334155" stroke-width="1" />
@@ -347,6 +377,7 @@
                 <circle cx="35" cy="100" r="15" fill="white" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,2" />
                 <text x="35" y="230" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">前提条件</text>
               </g>
+
               <g transform="translate(600, 40)">
                 <rect x="0" y="0" width="70" height="200" rx="4" fill="#F59E0B" stroke="#334155" stroke-width="2" />
                 <circle cx="20" cy="60" r="12" fill="white" stroke="#334155" stroke-width="1" />
@@ -354,6 +385,7 @@
                 <circle cx="35" cy="100" r="15" fill="white" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,2" />
                 <text x="35" y="230" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">行動</text>
               </g>
+
               <g transform="translate(740, 140)">
                 <path d="M0 -20 L5 -5 L20 0 L5 5 L0 20 L-5 5 L-20 0 L-5 -5 Z" fill="#EF4444" stroke="#991B1B" stroke-width="2" />
                 <text x="0" y="40" font-family="sans-serif" font-size="14" font-weight="bold" fill="#EF4444" text-anchor="middle">損害・損失</text>
@@ -362,10 +394,22 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600 bg-amber-50 p-4 rounded-xl border border-amber-100">
-            <div><strong class="text-amber-800">1. 組織的な影響:</strong><p>リソース配分、組織文化、方針。</p></div>
-            <div><strong class="text-amber-800">2. 不安全な監督:</strong><p>不適切な訓練、不備のあるスケジューリング、問題の放置。</p></div>
-            <div><strong class="text-amber-800">3. 前提条件:</strong><p>疲労、ストレス、過度な業務量、不備のある機器設計。</p></div>
-            <div><strong class="text-amber-800">4. 不安全な行為:</strong><p>スリップ、ラプス（ど忘れ）、間違い、または手順違反。</p></div>
+            <div>
+              <strong class="text-amber-800">1. 組織的な影響:</strong>
+              <p>リソース配分、組織文化、方針。</p>
+            </div>
+            <div>
+              <strong class="text-amber-800">2. 不安全な監督:</strong>
+              <p>不適切な訓練、不備のあるスケジューリング、問題の放置。</p>
+            </div>
+            <div>
+              <strong class="text-amber-800">3. 前提条件:</strong>
+              <p>疲労、ストレス、過度な業務量、不備のある機器設計。</p>
+            </div>
+            <div>
+              <strong class="text-amber-800">4. 不安全な行為:</strong>
+              <p>スリップ、ラプス（ど忘れ）、間違い、または手順違反。</p>
+            </div>
           </div>
         </div>
 
@@ -451,27 +495,44 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-              <strong class="text-indigo-800 flex items-center gap-2">患者要因</strong>
+              <strong class="text-indigo-800 flex items-center gap-2">
+                <i class="fas fa-user-injured"></i> 患者要因
+              </strong>
               <p class="text-xs text-slate-600 mt-2">臨床状態、複雑さ、コミュニケーションの壁、社会的要因。</p>
             </div>
+
             <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-              <strong class="text-indigo-800 flex items-center gap-2">タスクと技術</strong>
+              <strong class="text-indigo-800 flex items-center gap-2">
+                <i class="fas fa-tasks"></i> タスクと技術
+              </strong>
               <p class="text-xs text-slate-600 mt-2">プロトコル設計、検査結果の可用性、機器の操作性。</p>
             </div>
+
             <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-              <strong class="text-indigo-800 flex items-center gap-2">個人要因</strong>
+              <strong class="text-indigo-800 flex items-center gap-2">
+                <i class="fas fa-user-nurse"></i> 個人要因
+              </strong>
               <p class="text-xs text-slate-600 mt-2">知識、スキル、疲労、ストレス、身体的健康。</p>
             </div>
+
             <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-              <strong class="text-indigo-800 flex items-center gap-2">チーム要因</strong>
+              <strong class="text-indigo-800 flex items-center gap-2">
+                <i class="fas fa-users"></i> チーム要因
+              </strong>
               <p class="text-xs text-slate-600 mt-2">言語的コミュニケーション、記録、監督、助けを求める文化。</p>
             </div>
+
             <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-              <strong class="text-indigo-800 flex items-center gap-2">作業環境</strong>
+              <strong class="text-indigo-800 flex items-center gap-2">
+                <i class="fas fa-hospital"></i> 作業環境
+              </strong>
               <p class="text-xs text-slate-600 mt-2">人員配置、業務量、騒音、照明、管理的サポート。</p>
             </div>
+
             <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-              <strong class="text-indigo-800 flex items-center gap-2">組織と管理</strong>
+              <strong class="text-indigo-800 flex items-center gap-2">
+                <i class="fas fa-sitemap"></i> 組織と管理
+              </strong>
               <p class="text-xs text-slate-600 mt-2">安全文化、優先順位、方針、財務的制約。</p>
             </div>
           </div>
@@ -503,19 +564,25 @@
                 <div class="text-[10px] text-rose-800 font-bold mt-1">影響度</div>
                 <div class="text-[9px] text-rose-600">(どの程度深刻か)</div>
               </div>
+
               <div class="text-slate-300 text-xl">✖</div>
+
               <div class="bg-rose-100 p-3 rounded-lg w-24">
                 <div class="text-2xl font-bold text-rose-600">O</div>
                 <div class="text-[10px] text-rose-800 font-bold mt-1">頻度</div>
                 <div class="text-[9px] text-rose-600">(どの位起こるか)</div>
               </div>
+
               <div class="text-slate-300 text-xl">✖</div>
+
               <div class="bg-rose-100 p-3 rounded-lg w-24">
                 <div class="text-2xl font-bold text-rose-600">D</div>
                 <div class="text-[10px] text-rose-800 font-bold mt-1">検出難易度</div>
                 <div class="text-[9px] text-rose-600">(気づけるか)</div>
               </div>
+
               <div class="text-slate-400 text-xl">=</div>
+
               <div class="bg-slate-800 p-3 rounded-lg w-28 shadow-md">
                 <div class="text-2xl font-bold text-white">RPN</div>
                 <div class="text-[10px] text-slate-300 mt-1">リスク優先順位</div>
@@ -524,15 +591,258 @@
           </div>
         </div>
 
-      </div><!-- /grid -->
+      </div>
     </section>
 
-    <!-- (ส่วน chart/roadmap ของคุณเดิม อยู่ต่อได้ตามต้องการ — ไม่เกี่ยวกับปัญหาผลประมวลผล) -->
+    <section class="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-slate-200">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div class="lg:col-span-5 space-y-6">
+          <h2 class="text-3xl font-bold text-slate-800">2. 評価とステータス</h2>
+          <div class="h-1 w-20 bg-teal-500 rounded-full"></div>
+          <p class="text-slate-600 leading-relaxed font-light italic border-l-4 border-teal-500 pl-4 bg-teal-50/50 p-2 rounded-r-lg">
+            「<strong>AHRQ HSOPSC 2.0</strong> (10の評価項目) に基づきます。各項目の実際的な <strong>『肯定的回答率 (%)』</strong> を入力してください。チャートは、現実と理想（100%）の間のギャップを明らかにします。」
+          </p>
+
+          <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 max-h-[500px] overflow-y-auto">
+            <h4 class="text-xs font-bold text-slate-500 uppercase mb-3 tracking-wide flex items-center gap-2 sticky top-0 bg-slate-100 py-2 border-b">
+              <span>🎚️</span> 肯定的回答率 (%) を入力
+            </h4>
+            <div class="space-y-4 text-sm">
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">1. チームワーク</label>
+                  <span id="val-0" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(0, this.value)">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">2. 人員配置と業務スピード</label>
+                  <span id="val-1" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(1, this.value)">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">3. 組織的な学習</label>
+                  <span id="val-2" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(2, this.value)">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">4. エラーへの対応</label>
+                  <span id="val-3" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(3, this.value)">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">5. 上司のサポート</label>
+                  <span id="val-4" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(4, this.value)">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">6. エラーに関する伝達</label>
+                  <span id="val-5" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(5, this.value)">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">7. コミュニケーションの開放性</label>
+                  <span id="val-6" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(6, this.value)">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">8. 安全イベントの報告</label>
+                  <span id="val-7" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(7, this.value)">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">9. 病院経営層のサポート</label>
+                  <span id="val-8" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(8, this.value)">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <label class="text-slate-700 font-semibold text-xs">10. 申し送りと情報交換</label>
+                  <span id="val-9" class="text-teal-600 font-bold text-xs">0.00%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.01" value="0"
+                  class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                  oninput="updateChartData(9, this.value)">
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container mt-6">
+            <canvas id="assessmentChart"></canvas>
+          </div>
+          <p class="text-xs text-center text-slate-400 mt-2">インタラクティブ：あなたの回答率 vs 100% の理想</p>
+        </div>
+
+        <div class="lg:col-span-7 space-y-6">
+          <h3 class="xl font-bold text-slate-700 border-l-4 border-teal-500 pl-4">ギャップ分析と解決策</h3>
+          <div class="space-y-4">
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div class="flex items-start gap-3">
+                <div class="bg-red-100 text-red-600 p-2 rounded-lg font-bold text-xl">⚠️</div>
+                <div>
+                  <h4 class="font-bold text-slate-800">非懲罰的なエラーへの対応</h4>
+                  <p class="text-sm text-slate-600 mt-1"><strong>問題点:</strong> 職員が報告による処罰を恐れ、過少報告やリスクの隠蔽につながっています。</p>
+                  <div class="mt-3 bg-white p-3 rounded border border-slate-200 text-sm">
+                    <strong class="text-teal-600">✅ 解決策:</strong>
+                    <ul class="list-disc list-inside text-slate-500 mt-1">
+                      <li>経営層による「非難なし」の方針宣言。</li>
+                      <li><strong>代用テスト</strong>の実施（他の有資格者も同じミスを犯すか？ Yesなら＝システムの問題）。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div class="flex items-start gap-3">
+                <div class="bg-amber-100 text-amber-600 p-2 rounded-lg font-bold text-xl">⚡</div>
+                <div>
+                  <h4 class="font-bold text-slate-800">人員配置と業務負荷</h4>
+                  <p class="text-sm text-slate-600 mt-1"><strong>問題点:</strong> 過度な業務負荷が疲労を招き、近道（手順省略）への依存を助長しています。</p>
+                  <div class="mt-3 bg-white p-3 rounded border border-slate-200 text-sm">
+                    <strong class="text-teal-600">✅ 解決策:</strong>
+                    <ul class="list-disc list-inside text-slate-500 mt-1">
+                      <li>シフトスケジュールの最適化（ダブルシフトの回避）。</li>
+                      <li>自動化技術の活用による事務作業の削減と患者ケア時間の確保。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-slate-800">3. 導入ロードマップ</h2>
+        <div class="h-1 w-20 bg-blue-500 mx-auto mt-4 rounded-full"></div>
+        <p class="text-slate-600 mt-4">組織文化を体系的に変革するための 3フェーズ戦略計画。</p>
+      </div>
+
+      <div class="relative max-w-5xl mx-auto pl-8 md:pl-0">
+        <div class="timeline-line hidden md:block" style="left: 50%; transform: translateX(-50%);"></div>
+
+        <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div class="md:text-right md:pr-12 order-1">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-teal-500 relative">
+              <h3 class="text-xl font-bold text-teal-700">フェーズ 1: 信頼の構築</h3>
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">期間: 1-3ヶ月目</span>
+              <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+                リーダーと職員の意識を変え、安全に関する開かれた対話を促進することに焦点を当てます。
+              </p>
+              <div class="mt-4 pt-4 border-t border-slate-100 text-left">
+                <strong class="text-sm text-slate-700 block mb-2">🚀 主な活動:</strong>
+                <ul class="text-sm text-slate-600 space-y-2">
+                  <li>🔹 <strong>経営層による安全巡回：</strong> リーダーが現場を訪れ、命令ではなく「傾聴」します。</li>
+                  <li>🔹 <strong>脱・犯人捜しキャンペーン：</strong> 「誰が」ではなく「何が（システムの欠陥）」に焦点を移します。</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="absolute left-0 md:left-1/2 -translate-x-1/2 top-6 w-10 h-10 bg-teal-500 rounded-full border-4 border-white shadow-md z-10 flex items-center justify-center text-white font-bold">1</div>
+          <div class="hidden md:block order-2"></div>
+        </div>
+
+        <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div class="hidden md:block order-1"></div>
+          <div class="absolute left-0 md:left-1/2 -translate-x-1/2 top-6 w-10 h-10 bg-blue-500 rounded-full border-4 border-white shadow-md z-10 flex items-center justify-center text-white font-bold">2</div>
+          <div class="md:pl-12 order-2">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500 relative">
+              <h3 class="text-xl font-bold text-blue-700">フェーズ 2: 報告システムの確立</h3>
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">期間: 4-6ヶ月目</span>
+              <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+                報告を「簡単」かつ「有意義」なものにし、「報告し損」を防ぎます。
+              </p>
+              <div class="mt-4 pt-4 border-t border-slate-100 text-left">
+                <strong class="text-sm text-slate-700 block mb-2">🚀 主な活動:</strong>
+                <ul class="text-sm text-slate-600 space-y-2">
+                  <li>🔹 <strong>IRフォームの簡素化：</strong> 入力時間を2分以内に短縮します。</li>
+                  <li>🔹 <strong>グッドジョブ賞：</strong> ヒヤリ・ハットを報告した職員を表彰します。</li>
+                  <li>🔹 <strong>フィードバック・ループ：</strong> 対策状況を7日以内に報告者にフィードバックします。</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="md:text-right md:pr-12 order-1">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-amber-500 relative">
+              <h3 class="text-xl font-bold text-amber-600">フェーズ 3: 持続と学習</h3>
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">期間: 7ヶ月目以降</span>
+              <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+                対症療法的な問題解決から、予防的な学習（プロアクティブ・ラーニング）へと移行します。
+              </p>
+              <div class="mt-4 pt-4 border-t border-slate-100 text-left">
+                <strong class="text-sm text-slate-700 block mb-2">🚀 主な活動:</strong>
+                <ul class="text-sm text-slate-600 space-y-2">
+                  <li>🔹 <strong>セーフティ・ハドル：</strong> 毎朝5-10分の短いミーティングでリスクを確認します。</li>
+                  <li>🔹 <strong>RCAの徹底：</strong> 個人を責めずにシステムの真因を分析します。</li>
+                  <li>🔹 <strong>成功事例の共有：</strong> 「Safety-II」の視点で成功体験を他部署と共有します。</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="absolute left-0 md:left-1/2 -translate-x-1/2 top-6 w-10 h-10 bg-amber-500 rounded-full border-4 border-white shadow-md z-10 flex items-center justify-center text-white font-bold">3</div>
+          <div class="hidden md:block order-2"></div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
-  <div class="w-full px-4 2xl:px-12 pb-6">
+  <div class="container mx-auto px-4 pb-6">
     <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 shadow-sm">
-      <p class="text-indigo-700 font-bold italic mb-1">免責事項:</p>
+      <p class="text-indigo-700 font-bold italic mb-1">
+        免責事項:
+      </p>
       <p class="text-slate-600 text-sm leading-relaxed">
         本書の図表および内容は、公衆衛生サービスの分析および質向上のための初期ガイドとして、AI支援（AI-Assisted）により生成されました。
         利用者は内容を確認・検証し、組織の文脈に適応させ、実践に際しては関連する専門的基準を参照してください。
@@ -541,28 +851,38 @@
   </div>
 
   <script>
+    // --- Core Gemini API Call Function (PROXY VERSION) ---
     async function callGemini(prompt) {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: prompt })
+        });
 
-      if (!response.ok) {
-        let errData = {};
-        try { errData = await response.json(); } catch (_) {}
-        throw new Error(`Server Error: ${errData?.error?.message || response.statusText}`);
+        if (!response.ok) {
+          let errData = {};
+          try { errData = await response.json(); } catch (_) {}
+          throw new Error(`Server Error: ${errData.error?.message || response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+      } catch (error) {
+        console.error(error);
+        throw error;
       }
-
-      const data = await response.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     }
 
+    // ✅ sanitize: เอา code fence + script ออกกันหลุด
     function sanitizeLLMHtml(text) {
-      return String(text ?? "")
+      const raw = String(text ?? "")
         .replace(/```(?:html)?/gi, "")
         .replace(/```/g, "")
         .trim();
+
+      // remove script tags for safety
+      return raw.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
     }
 
     function stripHtml(html) {
@@ -578,82 +898,82 @@
       const resultDiv = document.getElementById('analyzeResult');
       const planInput = document.getElementById('planInput');
       const planResultDiv = document.getElementById('planResult');
-    
+
       if (!input.trim()) { alert("内容を入力してください"); return; }
-    
+
       runButton.disabled = true;
       spinner.classList.remove('hidden');
       resultDiv.classList.add('hidden');
       planResultDiv.classList.add('hidden');
       planInput.value = '分析中...';
-    
+
       try {
-        // Step 1: บังคับให้มี Swiss Cheese แน่ ๆ
+        // Step 1: ✅ Swiss cheese บังคับแน่ ๆ
         const promptAnalysis = `
-    あなたは医療安全の専門家（RCA担当）です。
-    以下の医療シナリオを日本語で分析してください: "${input}"
-    
-    【重要】
-    - 出力はHTMLのみ。Markdownの\`\`\`は禁止。
-    - 必ず以下の5セクションをこの順で含める:
-      1) イベントの概要
-      2) イベントのタイムライン
-      3) フィッシュボーン図（<div class="fishbone-grid"> を使う）
-      4) なぜなぜ分析 (5 Whys)
-      5) スイスチーズ・モデル分析（表: システム層 / タイプ / 穴(弱点) / 防御策）
-    
-    【必須フォーマット】
-    <h3 class="font-bold text-lg text-teal-700 mb-2">1. イベントの概要</h3>
-    <h3 class="font-bold text-lg text-teal-700 mb-2">2. イベントのタイムライン</h3>
-    <h3 class="font-bold text-lg text-amber-700 mb-2">3. フィッシュボーン図（石川図）</h3>
-    <div class="fishbone-grid">...</div>
-    <h3 class="font-bold text-lg text-pink-600 mb-2">4. なぜなぜ分析 (5 Whys)</h3>
-    <h3 class="font-bold text-lg text-green-700 mb-2">5. スイスチーズ・モデル分析</h3>
-    <table class="rca-table w-full">
-      <thead><tr><th>システム層</th><th>タイプ</th><th>穴（弱点）</th><th>防御策（提案）</th></tr></thead>
-      <tbody>...</tbody>
-    </table>
-    `.trim();
-    
+あなたは医療安全の専門家（RCA担当）です。
+以下の医療シナリオを日本語で分析してください: "${input}"
+
+【重要】
+- 出力はHTMLのみ。Markdownの\`\`\`は禁止。
+- 必ず以下の5セクションをこの順で含める:
+  1) イベントの概要
+  2) イベントのタイムライン
+  3) フィッシュボーン図（<div class="fishbone-grid"> を使う）
+  4) なぜなぜ分析 (5 Whys)
+  5) スイスチーズ・モデル分析（表: システム層 / タイプ / 穴(弱点) / 防御策）
+
+【必須フォーマット（見出しはこの文言で）】
+<h3 class="font-bold text-lg text-teal-700 mb-2">1. イベントの概要</h3>
+<h3 class="font-bold text-lg text-teal-700 mb-2">2. イベントのタイムライン</h3>
+<h3 class="font-bold text-lg text-amber-700 mb-2">3. フィッシュボーン図（石川図）</h3>
+<div class="fishbone-grid">...</div>
+<h3 class="font-bold text-lg text-pink-600 mb-2">4. なぜなぜ分析 (5 Whys)</h3>
+<h3 class="font-bold text-lg text-green-700 mb-2">5. スイスチーズ・モデル分析</h3>
+<table class="rca-table w-full">
+  <thead><tr><th>システム層</th><th>タイプ</th><th>穴（弱点）</th><th>防御策（提案）</th></tr></thead>
+  <tbody>...</tbody>
+</table>
+        `.trim();
+
         const resText = await callGemini(promptAnalysis);
         const htmlContent = sanitizeLLMHtml(resText);
-    
+
         resultDiv.innerHTML = htmlContent;
         resultDiv.classList.remove('hidden');
-    
+
         const cleanText = stripHtml(htmlContent);
         planInput.value = 'アクションプラン生成中...';
-    
-        // Step 2: บังคับให้มี 4 ส่วนครบ
+
+        // Step 2: ✅ 4 ส่วนบังคับแน่ ๆ
         const promptPlan = `
-    あなたは病院の安全管理者です。
-    以下の分析データに基づき、日本語HTMLのみで、必ず次の4部構成で出力してください（順番厳守）。Markdown禁止。
-    
-    分析データ:
-    "${cleanText}"
-    
-    (1) <h3>1. PDSA</h3>
-      - Plan / Do / Study / Act を見出し付きで具体化
-    
-    (2) <h3>2. Action Plan</h3>
-      - 表形式（列は最大5列）
-      - 施策 / 担当 / 期限 / KPI(成果指標) / リスクと対策
-    
-    (3) <h3>3. Initiative Ideas</h3>
-      - Quick Wins(0-30日), Mid-term(1-3ヶ月), Long-term(3-12ヶ月)
-    
-    (4) <h3>4. Conclusion & Recommendations</h3>
-      - 重要度順に5項目
-      - 最後に「次の一手（72時間以内）」を必ず入れる
-    `.trim();
-    
+あなたは病院の安全管理者です。
+以下の分析データに基づき、日本語HTMLのみで、必ず次の4部構成で出力してください（順番厳守）。Markdown禁止。
+
+分析データ:
+"${cleanText}"
+
+(1) <h3>1. PDSA</h3>
+  - Plan / Do / Study / Act を見出し付きで具体化
+
+(2) <h3>2. Action Plan</h3>
+  - 表形式（列は最大5列）
+  - 施策 / 担当 / 期限 / KPI(成果指標) / リスクと対策
+
+(3) <h3>3. Initiative Ideas</h3>
+  - Quick Wins(0-30日), Mid-term(1-3ヶ月), Long-term(3-12ヶ月)
+
+(4) <h3>4. Conclusion & Recommendations</h3>
+  - 重要度順に5項目
+  - 最後に「次の一手（72時間以内）」を必ず入れる
+        `.trim();
+
         const resPlan = await callGemini(promptPlan);
         const planHtml = sanitizeLLMHtml(resPlan);
-    
+
         planResultDiv.innerHTML = planHtml;
         planResultDiv.classList.remove('hidden');
         planInput.value = '✔ 完了しました';
-    
+
       } catch (error) {
         console.error(error);
         alert("エラー: " + error.message);
@@ -664,6 +984,68 @@
       }
     }
 
+    // (คงไว้) ฟังก์ชันเดิม – ไม่ตัดอะไรทิ้ง
+    async function analyzeRiskStep(input) {
+      const prompt = `あなたは医療安全の専門家（RCA担当）として振る舞ってください。
+以下の医療シナリオを日本語で分析してください: "${input}"。
+
+HTML形式で日本語で出力してください。Markdownコードブロックは使用しないでください。
+以下の構造に従ってください:
+
+<h3 class="font-bold text-lg text-teal-700 mb-2">1. イベントの概要</h3>
+<p class="mb-2 text-slate-600">...イベントの記述的要約...</p>
+<ul class="list-disc pl-5 mb-4 text-slate-600 space-y-1">
+  <li>...重要ポイント 1...</li>
+</ul>
+
+<h3 class="font-bold text-lg text-teal-700 mb-2">2. イベントのタイムライン</h3>
+<ol class="list-decimal pl-5 mb-4 text-slate-600 space-y-1">
+  <li>...詳細なステップ 1...</li>
+</ol>
+
+<h3 class="font-bold text-lg text-amber-700 mb-2">3. フィッシュボーン図（石川図）</h3>
+<div class="fishbone-grid">
+  <div class="fishbone-card"><div class="fishbone-header">👤 人 (Man)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
+  <div class="fishbone-card"><div class="fishbone-header">⚙️ 機械 (Machine)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
+  <div class="fishbone-card"><div class="fishbone-header">📝 方法 (Method)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
+  <div class="fishbone-card"><div class="fishbone-header">📦 材料 (Material)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
+  <div class="fishbone-card"><div class="fishbone-header">🌡️ 環境 (Environment)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
+  <div class="fishbone-card"><div class="fishbone-header">📏 測定 (Measurement)</div><ul class="list-disc pl-4 text-xs text-slate-600"><li>...要因...</li></ul></div>
+</div>
+
+<h3 class="font-bold text-lg text-pink-600 mb-2">4. なぜなぜ分析 (5 Whys)</h3>
+<div class="bg-pink-50 p-4 rounded-lg border border-pink-100 mb-4">
+  <div class="why-step"><div class="why-number">1</div><div class="why-line"></div><div class="text-sm text-slate-700 pt-1">なぜ...</div></div>
+  <div class="why-step"><div class="why-number">5</div><div class="text-sm text-slate-700 pt-1 font-bold text-pink-700">根本原因: ...</div></div>
+</div>
+
+<h3 class="font-bold text-lg text-green-700 mb-2">5. スイスチーズ・モデル分析</h3>
+<table class="rca-table w-full">
+  <thead><tr><th>システム層</th><th>タイプ</th><th>穴（弱点）</th><th>防御策</th></tr></thead>
+  <tbody>
+    <tr><td><strong>組織的な影響</strong></td><td>潜在的</td><td>...</td><td>...</td></tr>
+    <tr><td><strong>不安全な行為</strong></td><td>顕在的</td><td>...</td><td>...</td></tr>
+  </tbody>
+</table>`;
+
+      const responseText = await callGemini(prompt);
+      const formattedText = sanitizeLLMHtml(responseText);
+      const cleanText = stripHtml(formattedText);
+      return { html: formattedText, cleanText: cleanText };
+    }
+
+    async function generateActionPlanStep(analysisData) {
+      const prompt = `あなたは病院の安全管理者です。
+分析データ: "${analysisData}" に基づき、日本語のHTMLで、PDSA、Action Plan、Initiative Ideas、Conclusion & Recommendations を含むレスポンスを作成してください。`;
+
+      try {
+        const responseText = await callGemini(prompt);
+        return sanitizeLLMHtml(responseText);
+      } catch (error) {
+        console.error("Action Plan Error:", error);
+        throw new Error(`アクションプランの生成に失敗しました: ${error.message}`);
+      }
+    }
 
     function exportToWord() {
       const scenario = document.getElementById('scenarioInput').value;
@@ -685,13 +1067,41 @@
         </body>
         </html>
       `;
-
       const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = `Safety_Plan_${new Date().toISOString().slice(0,10)}.doc`;
       link.click();
+    }
+
+    // Chart.js
+    Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
+    const ctx = document.getElementById('assessmentChart');
+    const assessmentChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['チームワーク', '人員配置', '組織的学習', 'エラーへの対応', '上司のサポート', '伝達', '開放性', '報告', '経営層サポート', '申し送り'],
+        datasets: [
+          { label: '自院の現状 (%)', data: [0,0,0,0,0,0,0,0,0,0], backgroundColor: '#0D9488', borderRadius: 4 },
+          { label: '目標 (100%)', data: [100,100,100,100,100,100,100,100,100,100], backgroundColor: '#E2E8F0', borderRadius: 4 }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { suggestedMin: 0, max: 100 },
+          y: { grid: { display: false } }
+        }
+      }
+    });
+
+    function updateChartData(index, value) {
+      document.getElementById(`val-${index}`).innerText = parseFloat(value).toFixed(2) + '%';
+      assessmentChart.data.datasets[0].data[index] = value;
+      assessmentChart.update();
     }
   </script>
 </body>
