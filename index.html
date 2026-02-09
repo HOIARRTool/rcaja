@@ -963,7 +963,8 @@
           i += maxChars;
         }
         if (i < t.length && lines.length) {
-          lines[lines.length - 1] = lines[lines.length - 1].slice(0, Math.max(0, maxChars - 1)) + "…";
+          lines[lines.length - 1] =
+            lines[lines.length - 1].slice(0, Math.max(0, maxChars - 1)) + "…";
         }
         return lines;
       };
@@ -971,15 +972,23 @@
       // 1) หา “ช่วง fishbone” จากหัวข้อ 3.* ไปจนก่อนหัวข้อถัดไป
       const findFishboneSection = () => {
         const h3s = Array.from(rootEl.querySelectorAll("h3"));
-        const idx = h3s.findIndex(h => {
+        const idx = h3s.findIndex((h) => {
           const t = normalize(h.textContent);
-          return (t.includes("3.") || t.match(/^3\b/)) && (t.includes("フィッシュボーン") || t.toLowerCase().includes("fishbone") || t.toLowerCase().includes("ishikawa"));
+          return (
+            (t.includes("3.") || t.match(/^3\b/)) &&
+            (t.includes("フィッシュボーン") ||
+              t.toLowerCase().includes("fishbone") ||
+              t.toLowerCase().includes("ishikawa"))
+          );
         });
         if (idx < 0) {
-          // fallback: หา h3 ที่มีคำว่า fishbone/ishikawa
-          const idx2 = h3s.findIndex(h => {
+          const idx2 = h3s.findIndex((h) => {
             const t = normalize(h.textContent);
-            return (t.includes("フィッシュボーン") || t.toLowerCase().includes("fishbone") || t.toLowerCase().includes("ishikawa"));
+            return (
+              t.includes("フィッシュボーン") ||
+              t.toLowerCase().includes("fishbone") ||
+              t.toLowerCase().includes("ishikawa")
+            );
           });
           if (idx2 < 0) return null;
           return { h3: h3s[idx2], nextH3: h3s[idx2 + 1] || null };
@@ -992,7 +1001,6 @@
     
       // 2) Try JSON first (robust)
       const parseFromHiddenJSON = () => {
-        // JSON อาจอยู่ในช่วง fishbone เท่านั้น (ระหว่าง h3 นี้กับ h3 ถัดไป)
         let node = section.h3.nextElementSibling;
         while (node && node !== section.nextH3) {
           if (node.id === "fishbone-json") {
@@ -1000,11 +1008,13 @@
               const obj = JSON.parse(node.textContent || "{}");
               const cats = Array.isArray(obj.categories) ? obj.categories : [];
               const cleanCats = cats
-                .map(c => ({
+                .map((c) => ({
                   label: normalize(c?.label || ""),
-                  items: Array.isArray(c?.items) ? c.items.map(x => normalize(x)).filter(Boolean) : []
+                  items: Array.isArray(c?.items)
+                    ? c.items.map((x) => normalize(x)).filter(Boolean)
+                    : [],
                 }))
-                .filter(c => c.label)
+                .filter((c) => c.label)
                 .slice(0, 6);
     
               const effect = normalize(obj.effect || "");
@@ -1033,11 +1043,17 @@
           if (!label) continue;
     
           const lis = Array.from(el.querySelectorAll("li"))
-            .map(li => normalize(li.textContent))
+            .map((li) => normalize(li.textContent))
             .filter(Boolean);
     
-          const items = (lis.length ? lis : normalize(el.textContent).split(/・|\n|、/g).map(normalize).filter(s => s.length >= 4))
-            .filter(x => x && x !== label)
+          const items = (lis.length
+            ? lis
+            : normalize(el.textContent)
+                .split(/・|\n|、/g)
+                .map(normalize)
+                .filter((s) => s.length >= 4)
+          )
+            .filter((x) => x && x !== label)
             .slice(0, 5);
     
           cats.push({ label, items });
@@ -1055,29 +1071,29 @@
       const categories = (jsonData?.categories || cardData?.categories || []).slice(0, 6);
       if (!categories.length) return;
     
-      // effect/outcome priority: JSON.effect > extracted outcomeText > fallback label
       const effectText = normalize(jsonData?.effect) || normalize(outcomeText) || "イベント / 結果";
     
-      // 4) SVG (Ishikawa classic): spine ยิงเข้า “Effect box” ด้านขวา = หัวปลาชัดมาก
+      // ✅ สำคัญ: ฟังก์ชันทำ “ขอบขาว” ให้ข้อความ กันเส้นทับตัวอักษร
+      const textShieldStyle =
+        "paint-order: stroke fill; stroke: #FFFFFF; stroke-width: 6px; stroke-linejoin: round;";
+    
       const makeSVG = (cats, effect) => {
         const W = 1200, H = 620;
         const spineY = 310;
         const spineX1 = 120;
     
-        // Effect box (หัวปลา)
         const box = { x: 900, y: 240, w: 270, h: 140 };
     
-        // กระดูกหลัก
         const usable = cats.slice(0, 6);
         const n = usable.length || 1;
     
         const xStart = 300;
-        const xEnd = 860; // ก่อนถึง box
+        const xEnd = 860;
         const step = n > 1 ? (xEnd - xStart) / (n - 1) : 0;
     
         const topEndY = 120;
         const botEndY = 500;
-        const endDx = 170; // ยิ่งมาก = กระดูกชัน/ยาวขึ้น
+        const endDx = 170;
     
         const ribsFractions = [0.35, 0.55, 0.75, 0.90];
     
@@ -1088,32 +1104,32 @@
           const endX = x - endDx;
           const endY = isTop ? topEndY : botEndY;
     
-          // label box at bone end
           const labelW = 220;
           const labelH = 32;
           const labelX = endX - 10;
           const labelY = isTop ? endY - 46 : endY + 12;
     
           const label = escapeXML(c.label);
-          const items = (c.items || []).slice(0, 4).map(s => (s.length > 42 ? s.slice(0, 42) + "…" : s));
+          const items = (c.items || []).slice(0, 4).map((s) =>
+            s.length > 42 ? s.slice(0, 42) + "…" : s
+          );
     
-          // vector for ribs
           const dx = endX - x;
           const dy = endY - spineY;
           const len = Math.hypot(dx, dy) || 1;
           const ux = dx / len, uy = dy / len;
     
-          // perpendicular outward direction
-          // perp = (-uy, ux)
           let px = -uy, py = ux;
           const outwardSign = isTop ? -1 : 1;
           px *= outwardSign; py *= outwardSign;
     
-          const ribLine = 26;
-          const ribTextGap = 6;
+          // ✅ เดิมสั้นไป ทำให้ข้อความใกล้ก้าง -> ทับง่าย
+          const ribLine = 46;      // << เพิ่ม
+          const ribTextGap = 14;   // << เพิ่ม
     
           const ribs = items.map((txt, i) => {
             const f = ribsFractions[Math.min(i, ribsFractions.length - 1)];
+    
             const sx = x + dx * f;
             const sy = spineY + dy * f;
     
@@ -1121,22 +1137,27 @@
             const ey = sy + py * ribLine;
     
             const tx = ex + px * ribTextGap;
-            const ty = ey + (isTop ? -2 : 12);
+            const ty = ey + (isTop ? -6 : 14); // << ขยับข้อความออก/หลบเส้น
     
             return `
               <line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="#475569" stroke-width="2" />
-              <text x="${tx}" y="${ty}" font-family="sans-serif" font-size="12" fill="#0F172A">
+              <text x="${tx}" y="${ty}"
+                    font-family="sans-serif"
+                    font-size="12"
+                    font-weight="600"
+                    fill="#0F172A"
+                    style="${textShieldStyle}">
                 ${escapeXML(txt)}
               </text>
             `;
           }).join("");
     
           return `
-            <!-- main bone -->
             <line x1="${x}" y1="${spineY}" x2="${endX}" y2="${endY}" stroke="#334155" stroke-width="3" />
-            <!-- category label -->
-            <rect x="${labelX}" y="${labelY}" width="${labelW}" height="${labelH}" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2" />
-            <text x="${labelX + 12}" y="${labelY + 22}" font-family="sans-serif" font-size="14" font-weight="800" fill="#0F172A">
+            <rect x="${labelX}" y="${labelY}" width="${labelW}" height="${labelH}" rx="10"
+                  fill="#FFFFFF" stroke="#94A3B8" stroke-width="2" />
+            <text x="${labelX + 12}" y="${labelY + 22}" font-family="sans-serif" font-size="14" font-weight="800"
+                  fill="#0F172A" style="${textShieldStyle}">
               ${label}
             </text>
             ${ribs}
@@ -1145,7 +1166,7 @@
     
         const headLines = wrapByChars(effect, 14, 3).map(escapeXML);
         const headTspans = headLines.map((t, i) =>
-          `<tspan x="${box.x + box.w/2}" dy="${i === 0 ? 0 : 20}">${t}</tspan>`
+          `<tspan x="${box.x + box.w / 2}" dy="${i === 0 ? 0 : 20}">${t}</tspan>`
         ).join("");
     
         return `
@@ -1156,46 +1177,44 @@
               </marker>
             </defs>
     
-            <!-- tail (สื่อว่าต้นทางคือ Causes) -->
             <circle cx="${spineX1}" cy="${spineY}" r="10" fill="#0F172A" />
-            <text x="${spineX1}" y="${spineY - 18}" font-family="sans-serif" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">
+            <text x="${spineX1}" y="${spineY - 18}" font-family="sans-serif" font-size="12" font-weight="700"
+                  fill="#475569" text-anchor="middle" style="${textShieldStyle}">
               Causes
             </text>
     
-            <!-- spine -->
-            <line x1="${spineX1}" y1="${spineY}" x2="${box.x}" y2="${spineY}" stroke="#0F172A" stroke-width="6" marker-end="url(#ishikawaArrow)" />
+            <line x1="${spineX1}" y1="${spineY}" x2="${box.x}" y2="${spineY}" stroke="#0F172A" stroke-width="6"
+                  marker-end="url(#ishikawaArrow)" />
     
-            <!-- Effect box (หัวปลา) -->
             <rect x="${box.x}" y="${box.y}" width="${box.w}" height="${box.h}" rx="16"
                   fill="#0EA5E9" stroke="#0369A1" stroke-width="3" />
-            <text x="${box.x + box.w/2}" y="${box.y + 44}" font-family="sans-serif" font-size="14" font-weight="800"
-                  fill="#E0F2FE" text-anchor="middle">
+            <text x="${box.x + box.w / 2}" y="${box.y + 44}" font-family="sans-serif" font-size="14" font-weight="800"
+                  fill="#E0F2FE" text-anchor="middle" style="${textShieldStyle}">
               Event / Outcome
             </text>
-            <text x="${box.x + box.w/2}" y="${box.y + 78}" font-family="sans-serif" font-size="18" font-weight="900"
+            <text x="${box.x + box.w / 2}" y="${box.y + 78}" font-family="sans-serif" font-size="18" font-weight="900"
                   fill="#FFFFFF" text-anchor="middle">
               ${headTspans}
             </text>
     
-            <!-- bones -->
             ${bones}
     
-            <!-- helper label -->
-            <text x="${spineX1 + 10}" y="${spineY + 26}" font-family="sans-serif" font-size="12" fill="#64748B">
+            <text x="${spineX1 + 10}" y="${spineY + 26}" font-family="sans-serif" font-size="12" fill="#64748B"
+                  style="${textShieldStyle}">
               Ishikawa / Fishbone (major causes → effect)
             </text>
           </svg>
         `;
       };
     
-      // 5) Insert/replace viz
       const vizId = "fishbone-viz";
       const existing = rootEl.querySelector("#" + vizId);
       if (existing) existing.remove();
     
       const wrapper = document.createElement("div");
       wrapper.id = vizId;
-      wrapper.className = "fishbone-viz-wrap w-full bg-white rounded-xl border border-slate-200 p-3 mb-4 shadow-sm";
+      wrapper.className =
+        "fishbone-viz-wrap w-full bg-white rounded-xl border border-slate-200 p-3 mb-4 shadow-sm";
       wrapper.innerHTML = `
         <div class="flex items-center gap-2 mb-2">
           <span class="text-base">🐟</span>
@@ -1207,7 +1226,6 @@
         </div>
       `;
     
-      // แทรกใต้หัวข้อ fishbone เพื่อให้เห็นชัดทันที
       section.h3.insertAdjacentElement("afterend", wrapper);
     }
 
